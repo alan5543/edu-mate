@@ -5,7 +5,7 @@
       <el-header>
         <div style="display: flex;align-items: center;margin-top: 15px;margin-left: 10px;gap: 10px;">
           <img loading="lazy" alt="" src="@/assets/xiaozhi-logo.png" style="width: 45px;height: 45px;" />
-          <img loading="lazy" alt="" :src="xiaozhiAiIcon" style="height: 18px;" />
+          <img loading="lazy" alt="" :src="xiaozhiAiIcon" style="height: 100px;" />
         </div>
       </el-header>
       <div class="login-person">
@@ -16,7 +16,6 @@
           <div class="login-box">
             <!-- 修改标题部分 -->
             <div style="display: flex;align-items: center;gap: 20px;margin-bottom: 39px;padding: 0 30px;">
-              <img loading="lazy" alt="" src="@/assets/login/hi.png" style="width: 34px;height: 34px;" />
               <div class="login-text">{{ $t('retrievePassword.title') }}</div>
               <div class="login-welcome">
                 {{ $t('retrievePassword.subtitle') }}
@@ -71,7 +70,7 @@
               </div>
 
               <!-- 修改底部链接 -->
-              <div style="font-weight: 400;font-size: 14px;text-align: left;color: #5778ff;margin-top: 20px;">
+              <div style="font-weight: 400;font-size: 14px;text-align: left;color: #07c160;margin-top: 20px;">
                 <div style="cursor: pointer;" @click="goToLogin">{{ $t('retrievePassword.goToLogin') }}</div>
               </div>
             </div>
@@ -82,9 +81,9 @@
             <!-- 保持相同的协议声明 -->
             <div style="font-size: 14px;color: #979db1;">
               {{ $t('retrievePassword.agreeTo') }}
-              <div style="display: inline-block;color: #5778FF;cursor: pointer;">{{ $t('register.userAgreement') }}</div>
+              <div style="display: inline-block;color: #07c160;cursor: pointer;">{{ $t('register.userAgreement') }}</div>
               {{ $t('login.and') }}
-              <div style="display: inline-block;color: #5778FF;cursor: pointer;">{{ $t('register.privacyPolicy') }}</div>
+              <div style="display: inline-block;color: #07c160;cursor: pointer;">{{ $t('register.privacyPolicy') }}</div>
             </div>
           </div>
         </form>
@@ -92,7 +91,6 @@
 
       <!-- 保持相同的页脚 -->
       <el-footer>
-        <version-footer />
       </el-footer>
     </el-container>
   </div>
@@ -100,7 +98,6 @@
 
 <script>
 import Api from '@/apis/api';
-import VersionFooter from '@/components/VersionFooter.vue';
 import { getUUID, goToPage, showDanger, showSuccess, validateMobile, sm2Encrypt } from '@/utils';
 import { mapState } from 'vuex';
 import i18n from '@/i18n';
@@ -111,7 +108,6 @@ import { changeLanguage } from '@/i18n';
 export default {
   name: 'retrieve',
   components: {
-    VersionFooter
   },
   computed: {
     ...mapState({
@@ -128,17 +124,10 @@ export default {
       const currentLang = this.currentLanguage;
       switch (currentLang) {
         case "zh_CN":
-          return require("@/assets/xiaozhi-ai.png");
         case "zh_TW":
-          return require("@/assets/xiaozhi-ai_zh_TW.png");
-        case "en":
-          return require("@/assets/xiaozhi-ai_en.png");
-        case "de":
-          return require("@/assets/xiaozhi-ai_de.png");
-        case "vi":
-          return require("@/assets/xiaozhi-ai_vi.png");
+          return require("@/assets/edumate_ai_zh.png");
         default:
-          return require("@/assets/xiaozhi-ai.png");
+          return require("@/assets/edumate_ai_en.png");
       }
     },
     canSendMobileCaptcha() {
@@ -303,7 +292,7 @@ export default {
   line-height: 40px;
   border-radius: 4px;
   font-size: 14px;
-  background: rgb(87, 120, 255);
+  background: #07c160;
   border: none;
   padding: 0;
 

@@ -441,7 +441,7 @@ export default {
   display: flex;
   flex-direction: column;
   position: relative;
-  background: linear-gradient(to bottom right, #dce8ff, #e4eeff, #e6cbfd) center;
+  background: linear-gradient(135deg, #f0f9f0 0%, #e6f7e9 100%) center;
   background-size: cover;
   overflow: hidden;
   width: 100%;
@@ -471,7 +471,7 @@ export default {
 }
 
 .btn-search {
-  background: linear-gradient(135deg, #6b8cff, #a966ff);
+  background: linear-gradient(135deg, #07c160, #06ad56);
   border: none;
   color: white;
 }
@@ -485,7 +485,7 @@ export default {
   max-height: 80vh;
   box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
   position: relative;
-  background: rgba(237, 242, 255, 0.5);
+  background: rgba(240, 249, 240, 0.5);
   display: flex;
   flex-direction: column;
 }
@@ -570,7 +570,7 @@ export default {
   }
 
   .el-button--text:hover {
-    color: #5a64b5;
+    color: #06ad56;
   }
 
   /* 单元格文本样式 */
@@ -618,7 +618,7 @@ export default {
   }
 
   .el-button--primary {
-    background: #5f70f3;
+    background: #07c160;
     color: white;
   }
   .el-button--success {

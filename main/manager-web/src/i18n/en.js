@@ -203,7 +203,7 @@ export default {
   'firmwareDialog.firmwareFile': 'Firmware File',
   'firmwareDialog.clickUpload': 'Click to Upload',
   'firmwareDialog.uploadTip': 'Only firmware files (.bin/.apk) are supported, and size should not exceed 100MB',
-  'firmwareDialog.uploadHint': 'Warm reminder: Please upload the pre-merged xiaozhi.bin file, not the merged merged-binary.bin file',
+  'firmwareDialog.uploadHint': 'Warm reminder: Please upload the pre-merged edumate.bin file, not the merged merged-binary.bin file',
   'firmwareDialog.remark': 'Remark',
   'firmwareDialog.remarkPlaceholder': 'Please enter remark information',
   'firmwareDialog.requiredFirmwareName': 'Please enter firmware name (board + version)',
@@ -297,7 +297,7 @@ export default {
 
   // Register page related
   'register.title': 'Create Account',
-  'register.welcome': 'Welcome to XiaoZhi AI',
+  'register.welcome': 'Welcome to EduMate AI',
   'register.usernamePlaceholder': 'Please enter username',
   'register.mobilePlaceholder': 'Please enter mobile phone number',
   'register.captchaPlaceholder': 'Please enter captcha',
@@ -534,7 +534,7 @@ export default {
   'button.close': 'Close',
 
   // System information
-  'system.name': 'XiaoZhi Service',
+  'system.name': 'EduMate Service',
 
   // Voiceprint related
   'voiceprint.management': 'Voiceprint Management',
@@ -666,7 +666,7 @@ export default {
 
   // Home page text
   'home.addAgent': 'Add Agent',
-  'home.greeting': 'Hi XiaoZhi',
+  'home.greeting': 'Hi EduMate',
   'home.wish': "Let's have a wonderful day!",
   'home.languageModel': 'LLM',
   'home.voiceModel': 'TTS',
@@ -714,7 +714,7 @@ export default {
   'paramManagement.deleteFailed': 'Deletion failed, please try again',
   'paramManagement.operationCancelled': 'Deletion cancelled',
   'paramManagement.operationClosed': 'Operation closed',
-  'paramManagement.updateSuccess': 'Update successful. Some configurations will take effect only after restarting the xiaozhi-server module.',
+  'paramManagement.updateSuccess': 'Update successful. Some configurations will take effect only after restarting the EduMate-Server module.',
   'paramManagement.addSuccess': 'Add successful',
   'paramManagement.updateFailed': 'Update failed',
   'paramManagement.addFailed': 'Add failed',
@@ -863,7 +863,7 @@ export default {
   'modelConfig.enableSuccess': 'Enable successful',
   'modelConfig.disableSuccess': 'Disable successful',
   'modelConfig.operationFailed': 'Operation failed',
-  'modelConfig.setDefaultSuccess': 'Set default model successful, please restart the xiaozhi-server module manually in time',
+  'modelConfig.setDefaultSuccess': 'Set default model successful, please restart the EduMate-Server module manually in time',
   'modelConfig.itemsPerPage': '{items} items/page',
   'modelConfig.firstPage': 'First Page',
   'modelConfig.prevPage': 'Previous Page',

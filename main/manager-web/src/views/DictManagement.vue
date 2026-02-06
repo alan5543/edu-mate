@@ -119,7 +119,6 @@
         <DictDataDialog :visible.sync="dictDataDialogVisible" :title="dictDataDialogTitle" :dictData="dictDataForm"
             :dictTypeId="selectedDictType?.id" @save="saveDictData" />
         <el-footer style="flex-shrink:unset;">
-            <version-footer />
         </el-footer>
     </div>
 </template>
@@ -129,14 +128,12 @@ import dictApi from '@/apis/module/dict'
 import DictDataDialog from '@/components/DictDataDialog.vue'
 import DictTypeDialog from '@/components/DictTypeDialog.vue'
 import HeaderBar from '@/components/HeaderBar.vue'
-import VersionFooter from '@/components/VersionFooter.vue'
 export default {
     name: 'DictManagement',
     components: {
         HeaderBar,
         DictTypeDialog,
-        DictDataDialog,
-        VersionFooter
+        DictDataDialog
     },
     data() {
         return {
@@ -454,7 +451,7 @@ export default {
     position: relative;
     flex-direction: column;
     background-size: cover;
-    background: linear-gradient(to bottom right, #dce8ff, #e4eeff, #e6cbfd) center;
+    background: linear-gradient(135deg, #f0f9f0 0%, #e6f7e9 100%) center;
     -webkit-background-size: cover;
     -o-background-size: cover;
     overflow: hidden;
@@ -468,7 +465,7 @@ export default {
     max-height: 80vh;
     box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
     position: relative;
-    background: rgba(237, 242, 255, 0.5);
+    background: rgba(240, 249, 240, 0.5);
     display: flex;
     flex-direction: column;
 }
@@ -501,7 +498,7 @@ export default {
 }
 
 .btn-search {
-    background: linear-gradient(135deg, #6b8cff, #a966ff);
+    background: linear-gradient(135deg, #07c160, #06ad56);
     border: none;
     color: white;
 }
@@ -519,7 +516,7 @@ export default {
 }
 
 :deep(.search-input .el-input__inner:focus) {
-    border-color: #6b8cff;
+    border-color: #07c160;
     outline: none;
 }
 
@@ -639,7 +636,7 @@ export default {
     }
 
     .el-button--primary {
-        background: #5f70f3;
+        background: #07c160;
         color: white;
     }
 
@@ -672,7 +669,7 @@ export default {
         padding: 0 12px;
         border-radius: 4px;
         border: 1px solid #e4e7ed;
-        background: #dee7ff;
+        background: #f0f9f0;
         color: #606266;
         font-size: 14px;
         cursor: pointer;
@@ -706,12 +703,12 @@ export default {
     }
 
     .pagination-btn.active {
-        background: #5f70f3 !important;
+        background: #07c160 !important;
         color: #ffffff !important;
-        border-color: #5f70f3 !important;
+        border-color: #07c160 !important;
 
         &:hover {
-            background: #6d7cf5 !important;
+            background: #06ad56 !important;
         }
     }
 
@@ -731,7 +728,7 @@ export default {
         line-height: 32px;
         border-radius: 4px;
         border: 1px solid #e4e7ed;
-        background: #dee7ff;
+        background: #f0f9f0;
         color: #606266;
         font-size: 14px;
     }
@@ -769,7 +766,7 @@ export default {
 .edit-btn,
 .delete-btn {
     margin: 0 8px;
-    color: #7079aa !important;
+    color: #07c160 !important;
     font-size: 12px;
     padding: 7px 12px;
     height: 32px;
@@ -778,7 +775,7 @@ export default {
     transition: all 0.3s ease;
 
     &:hover {
-        color: #5a64b5 !important;
+        color: #06ad56 !important;
         transform: translateY(-1px);
     }
 }
@@ -827,11 +824,11 @@ export default {
 }
 
 :deep(.el-loading-spinner .path) {
-    stroke: #6b8cff;
+    stroke: #07c160;
 }
 
 :deep(.el-loading-text) {
-    color: #6b8cff !important;
+    color: #07c160 !important;
     font-size: 14px;
     margin-top: 8px;
 }
@@ -841,7 +838,7 @@ export default {
 }
 
 :deep(.dict-type-table .el-table__row.current-row) {
-    background-color: #5778ff !important;
+    background-color: #07c160 !important;
     color: white;
 }
 
@@ -854,7 +851,7 @@ export default {
 }
 
 :deep(.dict-type-table .el-table__row.current-row:hover) {
-    background-color: #5778ff !important;
+    background-color: #07c160 !important;
 }
 
 :deep(.dict-type-table .el-table__row td) {
@@ -906,7 +903,7 @@ export default {
 }
 
 :deep(.el-checkbox__input.is-checked .el-checkbox__inner) {
-    background-color: #5f70f3 !important;
-    border-color: #5f70f3 !important;
+    background-color: #07c160 !important;
+    border-color: #07c160 !important;
 }
 </style>

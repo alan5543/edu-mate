@@ -554,7 +554,7 @@ export default {
   flex-shrink: 0;
   width: 8px;
   height: 8px;
-  background-color: #5778ff;
+  background-color: #07c160;
   margin-right: 8px;
   border-radius: 50%;
 }
@@ -662,8 +662,8 @@ export default {
 }
 
 .custom-close-btn:hover {
-  color: #409EFF;
-  border-color: #409EFF;
+  color: #07c160;
+  border-color: #07c160;
 }
 
 ::v-deep .el-checkbox__label {
@@ -713,7 +713,7 @@ export default {
     margin-bottom: 12px;
 
     .doc-link {
-      color: #1677ff;
+      color: #07c160;
       text-decoration: none;
       margin-left: 4px;
 
@@ -743,7 +743,7 @@ export default {
     .inner-copy-btn {
       pointer-events: auto;
       border: none;
-      background: #1677ff;
+      background: #07c160;
       color: white;
       padding: 6px;
       margin-top: 4px;

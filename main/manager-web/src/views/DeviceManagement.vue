@@ -497,7 +497,7 @@ export default {
   display: flex;
   position: relative;
   flex-direction: column;
-  background: linear-gradient(to bottom right, #dce8ff, #e4eeff, #e6cbfd);
+  background: linear-gradient(135deg, #f0f9f0 0%, #e6f7e9 100%);
   background-size: cover;
   -webkit-background-size: cover;
   -o-background-size: cover;
@@ -511,7 +511,7 @@ export default {
   max-height: 80vh;
   box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
   position: relative;
-  background: rgba(237, 242, 255, 0.5);
+  background: rgba(240, 249, 240, 0.5);
   display: flex;
   flex-direction: column;
 }
@@ -541,7 +541,7 @@ export default {
 }
 
 .btn-search {
-  background: linear-gradient(135deg, #6b8cff, #a966ff);
+  background: linear-gradient(135deg, #07c160, #06ad56);
   border: none;
   color: white;
 }
@@ -563,7 +563,7 @@ export default {
   line-height: 32px;
   border-radius: 4px;
   border: 1px solid #e4e7ed;
-  background: #dee7ff;
+  background: #f0f9f0;
   color: #606266;
   font-size: 14px;
 }
@@ -598,7 +598,7 @@ export default {
 }
 
 ::v-deep .search-input .el-input__inner:focus {
-  border-color: #6b8cff;
+  border-color: #07c160;
   outline: none;
 }
 
@@ -674,7 +674,7 @@ export default {
 }
 
 .ctrl_btn .el-button--primary {
-  background: #5f70f3;
+  background: #07c160;
   color: white;
 }
 
@@ -707,7 +707,7 @@ export default {
   padding: 0 12px;
   border-radius: 4px;
   border: 1px solid #e4e7ed;
-  background: #dee7ff;
+  background: #f0f9f0;
   color: #606266;
   font-size: 14px;
   cursor: pointer;
@@ -744,13 +744,13 @@ export default {
 }
 
 .custom-pagination .pagination-btn.active {
-  background: #5f70f3 !important;
+  background: #07c160 !important;
   color: #ffffff !important;
-  border-color: #5f70f3 !important;
+  border-color: #07c160 !important;
 }
 
 .custom-pagination .pagination-btn.active:hover {
-  background: #6d7cf5 !important;
+  background: #06ad56 !important;
 }
 
 .custom-pagination .total-text {
@@ -782,12 +782,12 @@ export default {
 }
 
 :deep(.el-icon-edit) {
-  color: #7079aa;
+  color: #07c160;
   cursor: pointer;
 }
 
 :deep(.el-icon-edit:hover) {
-  color: #5a64b5;
+  color: #06ad56;
 }
 
 :deep(.custom-selection-header .el-checkbox) {
@@ -796,11 +796,11 @@ export default {
 
 
 :deep(.el-table .el-button--text) {
-  color: #7079aa;
+  color: #07c160 !important;
 }
 
 :deep(.el-table .el-button--text:hover) {
-  color: #5a64b5;
+  color: #06ad56 !important;
 }
 
 :deep(.transparent-table) {
@@ -841,8 +841,8 @@ export default {
 }
 
 :deep(.el-checkbox__input.is-checked .el-checkbox__inner) {
-  background-color: #5f70f3 !important;
-  border-color: #5f70f3 !important;
+  background-color: #07c160 !important;
+  border-color: #07c160 !important;
 }
 
 ::v-deep .el-table--border::after,

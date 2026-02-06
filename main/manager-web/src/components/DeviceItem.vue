@@ -125,8 +125,8 @@ export default {
 .settings-btn {
   font-weight: 500;
   font-size: 12px;
-  color: #5778ff;
-  background: #e6ebff;
+  color: #07c160;
+  background: #E1F3D8;
   width: auto;
   padding: 0 12px;
   height: 21px;

@@ -128,7 +128,7 @@ export default {
   cursor: pointer;
   flex: 1;
   border-radius: 23px;
-  background: #5778ff;
+  background: #07c160;
   height: 40px;
   font-weight: 500;
   font-size: 12px;
@@ -138,9 +138,9 @@ export default {
 }
 
 .cancel-btn {
-  background: #e6ebff;
-  border: 1px solid #adbdff;
-  color: #5778ff;
+  background: #E1F3D8;
+  border: 1px solid #a1d586;
+  color: #07c160;
 }
 
 ::v-deep .el-dialog {

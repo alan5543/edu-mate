@@ -20,7 +20,7 @@
               <div class="left-add" @click="showAddDialog">
                 {{ $t('home.addAgent') }}
               </div>
-              <div style="width: 23px;height: 13px;background: #5778ff;margin-left: -10px;" />
+              <div style="width: 23px;height: 13px;background: #07c160;margin-left: -10px;" />
               <div class="right-add">
                 <i class="el-icon-right" @click="showAddDialog" style="font-size: 20px;color: #fff;" />
               </div>
@@ -48,7 +48,6 @@
       <AddWisdomBodyDialog :visible.sync="addDeviceDialogVisible" @confirm="handleWisdomBodyAdded" />
     </el-main>
     <el-footer>
-      <version-footer />
     </el-footer>
     <chat-history-dialog :visible.sync="showChatHistory" :agent-id="currentAgentId" :agent-name="currentAgentName" />
   </div>
@@ -61,12 +60,11 @@ import AddWisdomBodyDialog from '@/components/AddWisdomBodyDialog.vue';
 import ChatHistoryDialog from '@/components/ChatHistoryDialog.vue';
 import DeviceItem from '@/components/DeviceItem.vue';
 import HeaderBar from '@/components/HeaderBar.vue';
-import VersionFooter from '@/components/VersionFooter.vue';
 import featureManager from '@/utils/featureManager';
 
 export default {
   name: 'HomePage',
-  components: { DeviceItem, AddWisdomBodyDialog, HeaderBar, VersionFooter, ChatHistoryDialog },
+  components: { DeviceItem, AddWisdomBodyDialog, HeaderBar, ChatHistoryDialog },
   data() {
     return {
       addDeviceDialogVisible: false,
@@ -212,7 +210,7 @@ export default {
   height: 100vh;
   display: flex;
   flex-direction: column;
-  background: linear-gradient(145deg, #e6eeff, #eff0ff);
+  background: linear-gradient(135deg, #f0f9f0 0%, #e6f7e9 100%);
   background-size: cover;
   /* 确保背景图像覆盖整个元素 */
   background-position: center;
@@ -229,9 +227,9 @@ export default {
   position: relative;
   overflow: hidden;
   background: linear-gradient(269.62deg,
-      #e0e6fd 0%,
-      #cce7ff 49.69%,
-      #d3d3fe 100%);
+      #e8f5e9 0%,
+      #c8e6c9 49.69%,
+      #a5d6a7 100%);
 }
 
 .add-device-bg {
@@ -279,7 +277,7 @@ export default {
     width: 105px;
     height: 34px;
     border-radius: 17px;
-    background: #5778ff;
+    background: #07c160;
     color: #fff;
     font-size: 14px;
     font-weight: 500;
@@ -291,7 +289,7 @@ export default {
     width: 34px;
     height: 34px;
     border-radius: 50%;
-    background: #5778ff;
+    background: #07c160;
     margin-left: -6px;
     display: flex;
     justify-content: center;

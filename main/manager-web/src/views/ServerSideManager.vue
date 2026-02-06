@@ -34,7 +34,6 @@
 
 
     <el-footer>
-      <version-footer />
     </el-footer>
   </div>
 </template>
@@ -43,11 +42,10 @@
 import Api from "@/apis/api";
 import HeaderBar from "@/components/HeaderBar.vue";
 import ParamDialog from "@/components/ParamDialog.vue";
-import VersionFooter from "@/components/VersionFooter.vue";
 import i18n from '@/i18n';
 
 export default {
-  components: { HeaderBar, ParamDialog, VersionFooter },
+  components: { HeaderBar, ParamDialog },
   data() {
     return {
       paramsList: [],
@@ -182,7 +180,7 @@ export default {
   position: relative;
   flex-direction: column;
   background-size: cover;
-  background: linear-gradient(to bottom right, #dce8ff, #e4eeff, #e6cbfd) center;
+  background: linear-gradient(135deg, #f0f9f0 0%, #e6f7e9 100%) center;
   -webkit-background-size: cover;
   -o-background-size: cover;
   overflow: hidden;
@@ -224,7 +222,7 @@ export default {
 }
 
 .btn-search {
-  background: linear-gradient(135deg, #6b8cff, #a966ff);
+  background: linear-gradient(135deg, #07c160, #06ad56);
   border: none;
   color: white;
 }
@@ -299,7 +297,7 @@ export default {
   }
 
   .el-button--primary {
-    background: #5f70f3;
+    background: #07c160;
     color: white;
   }
 
@@ -356,8 +354,8 @@ export default {
 }
 
 :deep(.el-checkbox__input.is-checked .el-checkbox__inner) {
-  background-color: #5f70f3 !important;
-  border-color: #5f70f3 !important;
+  background-color: #07c160 !important;
+  border-color: #07c160 !important;
 }
 
 @media (min-width: 1144px) {

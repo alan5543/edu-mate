@@ -97,7 +97,6 @@
         <param-dialog ref="paramDialog" :title="dialogTitle" :visible.sync="dialogVisible" :form="paramForm"
             @submit="handleSubmit" @cancel="dialogVisible = false" />
         <el-footer>
-            <version-footer />
         </el-footer>
     </div>
 </template>
@@ -106,9 +105,8 @@
 import Api from "@/apis/api";
 import HeaderBar from "@/components/HeaderBar.vue";
 import ParamDialog from "@/components/ParamDialog.vue";
-import VersionFooter from "@/components/VersionFooter.vue";
 export default {
-    components: { HeaderBar, ParamDialog, VersionFooter },
+    components: { HeaderBar, ParamDialog },
     data() {
         return {
             searchCode: "",
@@ -374,7 +372,7 @@ export default {
     position: relative;
     flex-direction: column;
     background-size: cover;
-    background: linear-gradient(to bottom right, #dce8ff, #e4eeff, #e6cbfd) center;
+    background: linear-gradient(135deg, #f0f9f0 0%, #e6f7e9 100%) center;
     -webkit-background-size: cover;
     -o-background-size: cover;
     overflow: hidden;
@@ -388,7 +386,7 @@ export default {
     max-height: 80vh;
     box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
     position: relative;
-    background: rgba(237, 242, 255, 0.5);
+    background: rgba(240, 249, 240, 0.5);
     display: flex;
     flex-direction: column;
 }
@@ -416,7 +414,7 @@ export default {
 }
 
 .btn-search {
-    background: linear-gradient(135deg, #6b8cff, #a966ff);
+    background: linear-gradient(135deg, #07c160, #06ad56);
     border: none;
     color: white;
 }
@@ -491,7 +489,7 @@ export default {
     }
 
     .el-button--primary {
-        background: #5f70f3;
+        background: #07c160;
         color: white;
     }
 
@@ -519,7 +517,7 @@ export default {
         padding: 0 12px;
         border-radius: 4px;
         border: 1px solid #e4e7ed;
-        background: #dee7ff;
+        background: #f0f9f0;
         color: #606266;
         font-size: 14px;
         cursor: pointer;
@@ -553,12 +551,12 @@ export default {
     }
 
     .pagination-btn.active {
-        background: #5f70f3 !important;
+        background: #07c160 !important;
         color: #ffffff !important;
-        border-color: #5f70f3 !important;
+        border-color: #07c160 !important;
 
         &:hover {
-            background: #6d7cf5 !important;
+            background: #06ad56 !important;
         }
     }
 
@@ -616,8 +614,8 @@ export default {
 }
 
 :deep(.el-checkbox__input.is-checked .el-checkbox__inner) {
-    background-color: #5f70f3 !important;
-    border-color: #5f70f3 !important;
+    background-color: #07c160 !important;
+    border-color: #07c160 !important;
 }
 
 @media (min-width: 1144px) {
@@ -643,11 +641,11 @@ export default {
 }
 
 :deep(.el-table .el-button--text) {
-    color: #7079aa;
+    color: #07c160;
 }
 
 :deep(.el-table .el-button--text:hover) {
-    color: #5a64b5;
+    color: #06ad56;
 }
 
 .el-button--success {
@@ -731,11 +729,11 @@ export default {
 }
 
 :deep(.el-loading-spinner .path) {
-    stroke: #6b8cff;
+    stroke: #07c160;
 }
 
 :deep(.el-loading-text) {
-    color: #6b8cff !important;
+    color: #07c160 !important;
     font-size: 14px;
     margin-top: 8px;
 }

@@ -39,7 +39,6 @@
         <voice-print-dialog :title="dialogTitle" :visible.sync="dialogVisible" :agentId="agentId" :form="paramForm"
             @submit="handleSubmit" @cancel="dialogVisible = false" />
         <el-footer>
-            <version-footer />
         </el-footer>
     </div>
 </template>
@@ -47,10 +46,9 @@
 <script>
 import Api from "@/apis/api";
 import HeaderBar from "@/components/HeaderBar.vue";
-import VersionFooter from "@/components/VersionFooter.vue";
 import VoicePrintDialog from "@/components/VoicePrintDialog.vue";
 export default {
-    components: { HeaderBar, VoicePrintDialog, VersionFooter },
+    components: { HeaderBar, VoicePrintDialog },
     data() {
         return {
             voicePrintList: [],
@@ -195,7 +193,7 @@ export default {
     position: relative;
     flex-direction: column;
     background-size: cover;
-    background: linear-gradient(to bottom right, #dce8ff, #e4eeff, #e6cbfd) center;
+    background: linear-gradient(135deg, #f0f9f0 0%, #e6f7e9 100%) center;
     -webkit-background-size: cover;
     -o-background-size: cover;
     overflow: hidden;
@@ -237,7 +235,7 @@ export default {
 }
 
 .btn-search {
-    background: linear-gradient(135deg, #6b8cff, #a966ff);
+    background: linear-gradient(135deg, #07c160, #06ad56);
     border: none;
     color: white;
 }
@@ -312,7 +310,7 @@ export default {
     }
 
     .el-button--primary {
-        background: #5f70f3;
+        background: #07c160;
         color: white;
     }
 
@@ -374,12 +372,12 @@ export default {
     }
 
     .pagination-btn.active {
-        background: #5f70f3 !important;
+        background: #07c160 !important;
         color: #ffffff !important;
-        border-color: #5f70f3 !important;
+        border-color: #07c160 !important;
 
         &:hover {
-            background: #6d7cf5 !important;
+            background: #06ad56 !important;
         }
     }
 
@@ -437,8 +435,8 @@ export default {
 }
 
 :deep(.el-checkbox__input.is-checked .el-checkbox__inner) {
-    background-color: #5f70f3 !important;
-    border-color: #5f70f3 !important;
+    background-color: #07c160 !important;
+    border-color: #07c160 !important;
 }
 
 @media (min-width: 1144px) {
@@ -468,7 +466,7 @@ export default {
 }
 
 :deep(.el-table .el-button--text:hover) {
-    color: #5a64b5;
+    color: #06ad56;
 }
 
 .el-button--success {
@@ -552,11 +550,11 @@ export default {
 }
 
 :deep(.el-loading-spinner .path) {
-    stroke: #6b8cff;
+    stroke: #07c160;
 }
 
 :deep(.el-loading-text) {
-    color: #6b8cff !important;
+    color: #07c160 !important;
     font-size: 14px;
     margin-top: 8px;
 }

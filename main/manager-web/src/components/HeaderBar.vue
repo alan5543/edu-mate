@@ -262,17 +262,10 @@ export default {
       const currentLang = this.currentLanguage;
       switch (currentLang) {
         case "zh_CN":
-          return require("@/assets/xiaozhi-ai.png");
         case "zh_TW":
-          return require("@/assets/xiaozhi-ai_zh_TW.png");
-        case "en":
-          return require("@/assets/xiaozhi-ai_en.png");
-        case "de":
-          return require("@/assets/xiaozhi-ai_de.png");
-        case "vi":
-          return require("@/assets/xiaozhi-ai_vi.png");
+          return require("@/assets/edumate_ai_zh.png");
         default:
-          return require("@/assets/xiaozhi-ai.png");
+          return require("@/assets/edumate_ai_en.png");
       }
     },
     // 用户菜单选项
@@ -677,7 +670,7 @@ export default {
 }
 
 .brand-img {
-  height: 20px;
+  height: 100px;
 }
 
 .header-center {
@@ -700,7 +693,7 @@ export default {
 .equipment-management {
   height: 30px;
   border-radius: 15px;
-  background: #deeafe;
+  background: #E1F3D8;
   display: flex;
   justify-content: center;
   font-size: 14px;
@@ -718,7 +711,7 @@ export default {
 }
 
 .equipment-management.active-tab {
-  background: #5778ff !important;
+  background: #07c160 !important;
   color: #fff !important;
 }
 

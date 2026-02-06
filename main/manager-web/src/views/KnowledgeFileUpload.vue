@@ -79,7 +79,7 @@
                   {{ $t('knowledgeFileUpload.batchDelete') }}
                 </el-button>
                 <el-button type="primary" icon="el-icon-search" @click="showRetrievalTestDialog"
-                  style="background-color: #409EFF; border-color: #409EFF;">
+                  style="background-color: #07c160; border-color: #07c160;">
                   {{ $t('knowledgeFileUpload.retrievalTest') }}
                 </el-button>
               </div>
@@ -256,7 +256,6 @@
     </el-dialog>
 
     <el-footer>
-      <version-footer />
     </el-footer>
   </div>
 </template>
@@ -265,10 +264,9 @@
 import Api from "@/apis/api";
 import KnowledgeBaseAPI from "@/apis/module/knowledgeBase";
 import HeaderBar from "@/components/HeaderBar.vue";
-import VersionFooter from "@/components/VersionFooter.vue";
 
 export default {
-  components: { HeaderBar, VersionFooter },
+  components: { HeaderBar },
   data() {
     return {
       datasetId: '',
@@ -1120,7 +1118,7 @@ export default {
   position: relative;
   flex-direction: column;
   background-size: cover;
-  background: linear-gradient(to bottom right, #dce8ff, #e4eeff, #e6cbfd) center;
+  background: linear-gradient(135deg, #f0f9f0 0%, #e6f7e9 100%) center;
   -webkit-background-size: cover;
   -o-background-size: cover;
   overflow: hidden;
@@ -1163,7 +1161,7 @@ export default {
 
 .btn-back:hover {
   background-color: #f5f7fa;
-  color: #409eff;
+  color: #07c160;
 }
 
 .knowledge-base-title {
@@ -1184,7 +1182,7 @@ export default {
 }
 
 .btn-search {
-  background: linear-gradient(135deg, #6b8cff, #a966ff);
+  background: linear-gradient(135deg, #07c160, #06ad56);
   border: none;
   color: white;
 }
@@ -1260,7 +1258,7 @@ export default {
   }
 
   .el-button--primary {
-    background: #5f70f3;
+    background: #07c160;
     color: white;
   }
 
@@ -1322,12 +1320,12 @@ export default {
   }
 
   .pagination-btn.active {
-    background: #5f70f3 !important;
+    background: #07c160 !important;
     color: #ffffff !important;
-    border-color: #5f70f3 !important;
+    border-color: #07c160 !important;
 
     &:hover {
-      background: #6d7cf5 !important;
+      background: #06ad56 !important;
     }
   }
 }
@@ -1436,7 +1434,7 @@ export default {
 }
 
 :deep(.el-table .el-button--text:hover) {
-  color: #5a64b5 !important;
+  color: #06ad56 !important;
 }
 
 :deep(.el-checkbox__inner) {
@@ -1449,8 +1447,8 @@ export default {
 }
 
 :deep(.el-checkbox__input.is-checked .el-checkbox__inner) {
-  background-color: #5f70f3 !important;
-  border-color: #5f70f3 !important;
+  background-color: #07c160 !important;
+  border-color: #07c160 !important;
 }
 
 :deep(.el-loading-mask) {
@@ -1459,7 +1457,7 @@ export default {
 }
 
 :deep(.el-loading-spinner .path) {
-  stroke: #6b8cff;
+  stroke: #07c160;
 }
 
 :deep(.el-table__empty-block) {
@@ -1484,7 +1482,7 @@ export default {
     transition: border-color 0.3s ease;
 
     &:hover {
-      border-color: #409eff;
+      border-color: #07c160;
     }
 
     .el-icon-upload {
@@ -1647,7 +1645,7 @@ export default {
       .score-value {
         font-size: 14px;
         font-weight: 600;
-        color: #409eff;
+        color: #07c160;
       }
     }
   }
@@ -1726,7 +1724,7 @@ export default {
     flex: 1;
 
     .el-icon-document {
-      color: #409eff;
+      color: #07c160;
       margin-right: 8px;
       font-size: 16px;
     }
@@ -2053,7 +2051,7 @@ export default {
 
 .count-value {
   font-weight: 600;
-  color: #409eff;
+  color: #07c160;
   font-size: 15px;
 }
 

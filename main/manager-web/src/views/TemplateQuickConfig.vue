@@ -77,7 +77,7 @@ export default {
   data() {
     return {
       form: {
-        agentCode: "小智",
+        agentCode: "學友",
         agentName: "",
         systemPrompt: "",
         sort: 0,
@@ -214,7 +214,7 @@ export default {
       this.form = {
         ...this.form,
         agentName: this.$t('templateQuickConfig.newTemplate'),
-        agentCode: '小智',
+        agentCode: '學友',
         systemPrompt: '',
         sort: 1
       };
@@ -265,7 +265,7 @@ export default {
   display: flex;
   position: relative;
   flex-direction: column;
-  background: linear-gradient(to bottom right, #dce8ff, #e4eeff, #e6cbfd);
+  background: linear-gradient(135deg, #f0f9f0 0%, #e6f7e9 100%);
   background-size: cover;
   -webkit-background-size: cover;
   -o-background-size: cover;
@@ -397,7 +397,7 @@ export default {
 .header-icon {
   width: 37px;
   height: 37px;
-  background: #5778ff;
+  background: #07c160;
   border-radius: 50%;
   display: flex;
   align-items: center;
@@ -438,8 +438,8 @@ export default {
 }
 
 .custom-close-btn:hover {
-  color: #409EFF;
-  border-color: #409EFF;
+  color: #07c160;
+  border-color: #07c160;
 }
 
 .header-actions {
@@ -450,7 +450,7 @@ export default {
 }
 
 .header-actions .save-btn {
-  background: #5778ff;
+  background: #07c160;
   color: white;
   border: none;
   border-radius: 18px;
@@ -460,9 +460,9 @@ export default {
 }
 
 .header-actions .reset-btn {
-  background: #e6ebff;
-  color: #5778ff;
-  border: 1px solid #adbdff;
+  background: #E1F3D8;
+  color: #07c160;
+  border: 1px solid #13ce66;
   border-radius: 18px;
   padding: 8px 16px;
   height: 32px;

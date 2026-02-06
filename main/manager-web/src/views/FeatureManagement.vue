@@ -92,21 +92,18 @@
     </div>
 
     <el-footer>
-      <VersionFooter />
     </el-footer>
   </div>
 </template>
 
 <script>
 import HeaderBar from "@/components/HeaderBar.vue";
-import VersionFooter from "@/components/VersionFooter.vue";
 import featureManager from "@/utils/featureManager.js";
 
 export default {
   name: "FeatureManagement",
   components: {
-    HeaderBar,
-    VersionFooter
+    HeaderBar
   },
   data() {
     return {
@@ -337,7 +334,7 @@ export default {
   position: relative;
   flex-direction: column;
   background-size: cover;
-  background: linear-gradient(to bottom right, #dce8ff, #e4eeff, #e6cbfd) center;
+  background: linear-gradient(135deg, #f0f9f0 0%, #e6f7e9 100%) center;
   -webkit-background-size: cover;
   -o-background-size: cover;
   overflow: hidden;
@@ -365,7 +362,7 @@ export default {
 .header-icon {
   width: 40px;
   height: 40px;
-  background: #5778ff;
+  background: #07c160;
   border-radius: 50%;
   display: flex;
   align-items: center;
@@ -393,7 +390,7 @@ export default {
 
 .btn-select-all {
   background: #e6ebff;
-  color: #5778ff;
+  color: #07c160;
   border: 1px solid #adbdff;
   border-radius: 18px;
   padding: 8px 16px;
@@ -406,7 +403,7 @@ export default {
 }
 
 .save-btn {
-  background: #5778ff;
+  background: #07c160;
   color: white;
   border: none;
   border-radius: 18px;
@@ -416,12 +413,12 @@ export default {
 }
 
 .save-btn:hover {
-  background: #4a6ae8;
+  background: #06ad56;
 }
 
 .reset-btn {
   background: #e6ebff;
-  color: #5778ff;
+  color: #07c160;
   border: 1px solid #adbdff;
   border-radius: 18px;
   padding: 8px 16px;
@@ -509,8 +506,8 @@ export default {
 }
 
 .feature-card-item.feature-enabled {
-  border-color:#5778ff;
-  box-shadow: 0 4px 16px rgba(95, 112, 243, 0.2);
+  border-color:#07c160;
+  box-shadow: 0 4px 16px rgba(7, 193, 96, 0.2);
   transform: translateY(-2px);
 }
 
@@ -526,12 +523,12 @@ export default {
 }
 
 .feature-checkbox ::v-deep .el-checkbox__input.is-checked .el-checkbox__inner {
-  background-color: #5778ff;
-  border-color: #5778ff;
+  background-color: #07c160;
+  border-color: #07c160;
 }
 
 .feature-checkbox ::v-deep .el-checkbox__input.is-checked + .el-checkbox__label {
-  color: #5778ff;
+  color: #07c160;
 }
 
 
@@ -589,7 +586,7 @@ export default {
   color: #303133;
   margin-bottom: 12px;
   padding-left: 12px;
-  border-left: 4px solid #5f70f3;
+  border-left: 4px solid #07c160;
   text-align: left;
 }
 

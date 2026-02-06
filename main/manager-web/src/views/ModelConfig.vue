@@ -261,7 +261,6 @@
       />
     </div>
     <el-footer>
-      <version-footer />
     </el-footer>
   </div>
 </template>
@@ -272,9 +271,8 @@ import AddModelDialog from "@/components/AddModelDialog.vue";
 import HeaderBar from "@/components/HeaderBar.vue";
 import ModelEditDialog from "@/components/ModelEditDialog.vue";
 import TtsModel from "@/components/TtsModel.vue";
-import VersionFooter from "@/components/VersionFooter.vue";
 export default {
-  components: { HeaderBar, ModelEditDialog, TtsModel, AddModelDialog, VersionFooter },
+  components: { HeaderBar, ModelEditDialog, TtsModel, AddModelDialog },
   data() {
     return {
       addDialogVisible: false,
@@ -638,7 +636,7 @@ export default {
   position: relative;
   flex-direction: column;
   background-size: cover;
-  background: linear-gradient(to bottom right, #dce8ff, #e4eeff, #e6cbfd) center;
+  background: linear-gradient(135deg, #f0f9f0 0%, #e6f7e9 100%) center;
   -webkit-background-size: cover;
   -o-background-size: cover;
 }
@@ -651,7 +649,7 @@ export default {
   max-height: 80vh;
   box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
   position: relative;
-  background: rgba(237, 242, 255, 0.5);
+  background: rgba(240, 249, 240, 0.5);
 }
 
 .operation-bar {
@@ -679,11 +677,11 @@ export default {
 .nav-panel {
   min-width: 242px;
   height: 100%;
-  border-right: 1px solid #ebeef5;
+  border-right: 1px solid #e1f3d8;
   background: linear-gradient(
       120deg,
-      rgba(107, 140, 255, 0.3) 0%,
-      rgba(169, 102, 255, 0.3) 25%,
+      rgba(7, 193, 96, 0.1) 0%,
+      rgba(6, 173, 86, 0.1) 25%,
       transparent 60%
     ),
     url("../assets/model/model.png") no-repeat center / cover;
@@ -695,7 +693,7 @@ export default {
 
 .nav-panel .el-menu-item {
   height: 50px;
-  background: #e9f0ff;
+  background: #f0f9f0;
   line-height: 50px;
   border-radius: 4px 0 0 4px !important;
   transition: all 0.3s;
@@ -708,7 +706,7 @@ export default {
 }
 
 .nav-panel .el-menu-item.is-active {
-  background: #5778ff;
+  background: #07c160;
   position: relative;
   padding-left: 40px !important;
 }
@@ -723,7 +721,7 @@ export default {
   height: 13px;
   background: #fff;
   border-radius: 50%;
-  box-shadow: 0 0 4px rgba(64, 158, 255, 0.5);
+  box-shadow: 0 0 4px rgba(7, 193, 96, 0.5);
 }
 
 .menu-text {
@@ -761,7 +759,7 @@ export default {
 }
 
 .btn-search {
-  background: linear-gradient(135deg, #6b8cff, #a966ff);
+  background: linear-gradient(135deg, #07c160, #06ad56);
   border: none;
   color: white;
 }
@@ -788,7 +786,7 @@ export default {
   line-height: 32px;
   border-radius: 4px;
   border: 1px solid #e4e7ed;
-  background: #dee7ff;
+  background: #f0f9f0;
   color: #606266;
   font-size: 14px;
 }
@@ -823,7 +821,7 @@ export default {
 }
 
 ::v-deep .search-input .el-input__inner:focus {
-  border-color: #6b8cff;
+  border-color: #07c160;
   outline: none;
 }
 
@@ -878,7 +876,7 @@ export default {
 }
 
 .batch-actions .el-button--primary {
-  background: #5f70f3 !important;
+  background: #07c160 !important;
   color: white;
 }
 
@@ -893,13 +891,13 @@ export default {
 }
 
 .batch-actions .el-button:first-child {
-  background: linear-gradient(135deg, #409eff, #6b8cff);
+  background: linear-gradient(135deg, #07c160, #06ad56);
   border: none;
   color: white;
 }
 
 .batch-actions .el-button:first-child:hover {
-  background: linear-gradient(135deg, #3a8ee6, #5a7cff);
+  background: linear-gradient(135deg, #06ad56, #059e4e);
 }
 
 .el-table th /deep/ .el-table__cell {
@@ -979,12 +977,12 @@ export default {
 }
 
 ::v-deep .el-checkbox__input.is-checked .el-checkbox__inner {
-  background-color: #5f70f3;
-  border-color: #5f70f3;
+  background-color: #07c160;
+  border-color: #07c160;
 }
 
 .voice-management-btn {
-  background: #9db3ea;
+  background: #84e0a3;
   color: white;
   min-width: 68px;
   line-height: 14px;
@@ -994,7 +992,7 @@ export default {
 }
 
 .voice-management-btn:hover {
-  background: #8aa2e0;
+  background: #6bd18e;
   /* 悬停时颜色加深 */
   transform: scale(1.05);
 }
@@ -1010,7 +1008,7 @@ export default {
 .edit-btn,
 .delete-btn {
   margin: 0 8px;
-  color: #7079aa !important;
+  color: #07c160 !important;
 }
 
 ::v-deep .el-table .cell {
@@ -1069,9 +1067,9 @@ export default {
   }
 
   .pagination-btn.active {
-    background: #5f70f3 !important;
+    background: #07c160 !important;
     color: #ffffff !important;
-    border-color: #5f70f3 !important;
+    border-color: #07c160 !important;
 
     &:hover {
       background: #6d7cf5 !important;
@@ -1124,11 +1122,11 @@ export default {
 }
 
 ::v-deep .el-loading-spinner .path {
-  stroke: #6b8cff;
+  stroke: #07c160;
 }
 
 ::v-deep .el-loading-text {
-  color: #6b8cff !important;
+  color: #07c160 !important;
   font-size: 14px;
   margin-top: 8px;
 }

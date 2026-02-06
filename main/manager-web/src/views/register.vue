@@ -1,117 +1,122 @@
 <template>
   <div class="welcome" @keyup.enter="register">
-    <!-- Centered header with logo -->
-    <div class="auth-header">
-      <img loading="lazy" alt="" src="@/assets/xiaozhi-logo.png" style="width: 48px; height: 48px;" />
-      <img loading="lazy" alt="" :src="xiaozhiAiIcon" style="height: 22px;" />
-    </div>
-
-    <!-- Centered register card -->
-    <div class="login-box">
-      <!-- Title section -->
-      <div style="text-align: center; margin-bottom: 40px;">
-        <div class="login-text">{{ $t('register.title') }}</div>
-        <div class="login-welcome">{{ $t('register.welcome') }}</div>
+    <el-container style="height: 100%;">
+      <!-- 保持相同的头部 -->
+      <el-header>
+        <div style="display: flex;align-items: center;margin-top: 15px;margin-left: 10px;gap: 10px;">
+          <img loading="lazy" alt="" src="@/assets/xiaozhi-logo.png" style="width: 45px;height: 45px;" />
+          <img loading="lazy" alt="" :src="xiaozhiAiIcon" style="height: 100px;" />
+        </div>
+      </el-header>
+      <div class="login-person">
+        <img loading="lazy" alt="" src="@/assets/login/register-person.png" style="width: 100%;" />
       </div>
-
-      <!-- Form fields -->
-      <div>
-        <form @submit.prevent="register">
-          <!-- Username input (non-mobile registration) -->
-          <div class="input-box" v-if="!enableMobileRegister">
-            <img loading="lazy" alt="" class="input-icon" src="@/assets/login/username.png" />
-            <el-input v-model="form.username" :placeholder="$t('register.usernamePlaceholder')" />
+      <el-main style="position: relative;">
+        <div class="login-box">
+          <!-- 修改标题部分 -->
+          <div style="display: flex;align-items: center;gap: 20px;margin-bottom: 39px;padding: 0 30px;">
+            <div class="login-text">{{ $t('register.title') }}</div>
+            <div class="login-welcome">
+              {{ $t('register.welcome') }}
+            </div>
           </div>
 
-          <!-- Mobile registration -->
-          <template v-if="enableMobileRegister">
-            <div class="input-box">
-              <div style="display: flex; align-items: center; width: 100%;">
-                <el-select v-model="form.areaCode" style="width: 220px; margin-right: 10px;">
-                  <el-option v-for="item in mobileAreaList" :key="item.key" :label="`${item.name} (${item.key})`"
-                    :value="item.key" />
-                </el-select>
-                <el-input v-model="form.mobile" :placeholder="$t('register.mobilePlaceholder')" />
+          <div style="padding: 0 30px;">
+            <form @submit.prevent="register">
+              <!-- 用户名/手机号输入框 -->
+              <div class="input-box" v-if="!enableMobileRegister">
+                <img loading="lazy" alt="" class="input-icon" src="@/assets/login/username.png" />
+                <el-input v-model="form.username" :placeholder="$t('register.usernamePlaceholder')" />
               </div>
-            </div>
 
-            <!-- Image captcha -->
-            <div style="display: flex; align-items: center; margin-top: 24px; width: 100%; gap: 10px;">
-              <div class="input-box" style="width: calc(100% - 160px); margin-top: 0;">
-                <img loading="lazy" alt="" class="input-icon" src="@/assets/login/shield.png" />
-                <el-input v-model="form.captcha" :placeholder="$t('register.captchaPlaceholder')"
-                  style="flex: 1;" />
+              <!-- 手机号注册部分 -->
+              <template v-if="enableMobileRegister">
+                <div class="input-box">
+                  <div style="display: flex; align-items: center; width: 100%;">
+                    <el-select v-model="form.areaCode" style="width: 220px; margin-right: 10px;">
+                      <el-option v-for="item in mobileAreaList" :key="item.key" :label="`${item.name} (${item.key})`"
+                        :value="item.key" />
+                    </el-select>
+                    <el-input v-model="form.mobile" :placeholder="$t('register.mobilePlaceholder')" />
+                  </div>
+                </div>
+
+                <div style="display: flex; align-items: center; margin-top: 20px; width: 100%; gap: 10px;">
+                  <div class="input-box" style="width: calc(100% - 130px); margin-top: 0;">
+                    <img loading="lazy" alt="" class="input-icon" src="@/assets/login/shield.png" />
+                    <el-input v-model="form.captcha" :placeholder="$t('register.captchaPlaceholder')"
+                      style="flex: 1;" />
+                  </div>
+                  <img loading="lazy" v-if="captchaUrl" :src="captchaUrl" alt="验证码"
+                    style="width: 150px; height: 40px; cursor: pointer;" @click="fetchCaptcha" />
+                </div>
+
+                <!-- 手机验证码 -->
+
+                <div style="display: flex; align-items: center; margin-top: 20px; width: 100%; gap: 10px;">
+                  <div class="input-box" style="width: calc(100% - 130px); margin-top: 0;">
+                    <img loading="lazy" alt="" class="input-icon" src="@/assets/login/phone.png" />
+                    <el-input v-model="form.mobileCaptcha" :placeholder="$t('register.mobileCaptchaPlaceholder')"
+                      style="flex: 1;" maxlength="6" />
+                  </div>
+                  <el-button type="primary" class="send-captcha-btn" :disabled="!canSendMobileCaptcha"
+                    @click="sendMobileCaptcha">
+                    <span>
+                      {{ countdown > 0 ? `${countdown}${$t('register.secondsLater')}` : $t('register.sendCaptcha') }}
+                    </span>
+                  </el-button>
+                </div>
+              </template>
+
+              <!-- 密码输入框 -->
+              <div class="input-box">
+                <img loading="lazy" alt="" class="input-icon" src="@/assets/login/password.png" />
+                <el-input v-model="form.password" :placeholder="$t('register.passwordPlaceholder')" type="password"
+                  show-password />
               </div>
-              <img loading="lazy" v-if="captchaUrl" :src="captchaUrl" alt="验证码"
-                style="width: 150px; height: 56px; cursor: pointer; border-radius: 12px; border: 2px solid #e2e8f0;"
-                @click="fetchCaptcha" />
-            </div>
 
-            <!-- Mobile verification code -->
-            <div style="display: flex; align-items: center; margin-top: 24px; width: 100%; gap: 10px;">
-              <div class="input-box" style="width: calc(100% - 130px); margin-top: 0;">
-                <img loading="lazy" alt="" class="input-icon" src="@/assets/login/phone.png" />
-                <el-input v-model="form.mobileCaptcha" :placeholder="$t('register.mobileCaptchaPlaceholder')"
-                  style="flex: 1;" maxlength="6" />
+              <!-- 新增确认密码 -->
+              <div class="input-box">
+                <img loading="lazy" alt="" class="input-icon" src="@/assets/login/password.png" />
+                <el-input v-model="form.confirmPassword" :placeholder="$t('register.confirmPasswordPlaceholder')"
+                  type="password" show-password />
               </div>
-              <el-button type="primary" class="send-captcha-btn" :disabled="!canSendMobileCaptcha"
-                @click="sendMobileCaptcha">
-                <span>
-                  {{ countdown > 0 ? `${countdown}${$t('register.secondsLater')}` : $t('register.sendCaptcha') }}
-                </span>
-              </el-button>
-            </div>
-          </template>
 
-          <!-- Password -->
-          <div class="input-box">
-            <img loading="lazy" alt="" class="input-icon" src="@/assets/login/password.png" />
-            <el-input v-model="form.password" :placeholder="$t('register.passwordPlaceholder')" type="password"
-              show-password />
+              <!-- 验证码部分保持相同 -->
+              <div v-if="!enableMobileRegister"
+                style="display: flex; align-items: center; margin-top: 20px; width: 100%; gap: 10px;">
+                <div class="input-box" style="width: calc(100% - 130px); margin-top: 0;">
+                  <img loading="lazy" alt="" class="input-icon" src="@/assets/login/shield.png" />
+                  <el-input v-model="form.captcha" :placeholder="$t('register.captchaPlaceholder')" style="flex: 1;" />
+                </div>
+                <img loading="lazy" v-if="captchaUrl" :src="captchaUrl" alt="验证码"
+                  style="width: 150px; height: 40px; cursor: pointer;" @click="fetchCaptcha" />
+              </div>
+
+              <!-- 修改底部链接 -->
+              <div style="font-weight: 400;font-size: 14px;text-align: left;color: #07c160;margin-top: 20px;">
+                <div style="cursor: pointer;" @click="goToLogin">{{ $t('register.goToLogin') }}</div>
+              </div>
+            </form>
           </div>
 
-          <!-- Confirm password -->
-          <div class="input-box">
-            <img loading="lazy" alt="" class="input-icon" src="@/assets/login/password.png" />
-            <el-input v-model="form.confirmPassword" :placeholder="$t('register.confirmPasswordPlaceholder')"
-              type="password" show-password />
+          <!-- 修改按钮文本 -->
+          <div class="login-btn" @click="register">{{ $t('register.registerButton') }}</div>
+
+          <!-- 保持相同的协议声明 -->
+          <div style="font-size: 14px;color: #979db1;">
+            {{ $t('register.agreeTo') }}
+            <div style="display: inline-block;color: #07c160;cursor: pointer;">{{ $t('register.userAgreement') }}</div>
+            {{ $t('login.and') }}
+            <div style="display: inline-block;color: #07c160;cursor: pointer;">{{ $t('register.privacyPolicy') }}</div>
           </div>
+        </div>
+      </el-main>
 
-          <!-- Image captcha (non-mobile registration) -->
-          <div v-if="!enableMobileRegister"
-            style="display: flex; align-items: center; margin-top: 24px; width: 100%; gap: 10px;">
-            <div class="input-box" style="width: calc(100% - 160px); margin-top: 0;">
-              <img loading="lazy" alt="" class="input-icon" src="@/assets/login/shield.png" />
-              <el-input v-model="form.captcha" :placeholder="$t('register.captchaPlaceholder')" style="flex: 1;" />
-            </div>
-            <img loading="lazy" v-if="captchaUrl" :src="captchaUrl" alt="验证码"
-              style="width: 150px; height: 56px; cursor: pointer; border-radius: 12px; border: 2px solid #e2e8f0;"
-              @click="fetchCaptcha" />
-          </div>
-
-          <!-- Link to login -->
-          <div style="font-weight: 500; font-size: 14px; margin-top: 20px;">
-            <div style="cursor: pointer; color: #8b5cf6; transition: color 0.3s;" @click="goToLogin"
-              @mouseenter="$event.target.style.color='#7c3aed'"
-              @mouseleave="$event.target.style.color='#8b5cf6'">
-              {{ $t('register.goToLogin') }}
-            </div>
-          </div>
-        </form>
-      </div>
-
-      <!-- Register button -->
-      <div class="login-btn" @click="register">{{ $t('register.registerButton') }}</div>
-
-      <!-- Terms -->
-      <div style="font-size: 13px; color: #64748b; text-align: center; line-height: 1.6;">
-        {{ $t('register.agreeTo') }}
-        <span style="color: #8b5cf6; cursor: pointer; font-weight: 500;">{{ $t('register.userAgreement') }}</span>
-        {{ $t('login.and') }}
-        <span style="color: #8b5cf6; cursor: pointer; font-weight: 500;">{{ $t('register.privacyPolicy') }}</span>
-      </div>
-    </div>
-
+      <!-- 保持相同的页脚 -->
+      <el-footer>
+      </el-footer>
+    </el-container>
   </div>
 </template>
 
@@ -125,7 +130,8 @@ import i18n from '@/i18n';
 
 export default {
   name: 'register',
-  components: {},
+  components: {
+  },
   computed: {
     ...mapState({
       allowUserRegister: state => state.pubConfig.allowUserRegister,
@@ -142,17 +148,10 @@ export default {
       const currentLang = this.currentLanguage;
       switch (currentLang) {
         case "zh_CN":
-          return require("@/assets/xiaozhi-ai.png");
         case "zh_TW":
-          return require("@/assets/xiaozhi-ai_zh_TW.png");
-        case "en":
-          return require("@/assets/xiaozhi-ai_en.png");
-        case "de":
-          return require("@/assets/xiaozhi-ai_de.png");
-        case "vi":
-          return require("@/assets/xiaozhi-ai_vi.png");
+          return require("@/assets/edumate_ai_zh.png");
         default:
-          return require("@/assets/xiaozhi-ai.png");
+          return require("@/assets/edumate_ai_en.png");
       }
     },
     canSendMobileCaptcha() {
@@ -338,6 +337,21 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-@import './auth-modern.scss';
+@import './auth.scss';
 
+.send-captcha-btn {
+  margin-right: -5px;
+  min-width: 100px;
+  height: 40px;
+  border-radius: 4px;
+  font-size: 14px;
+  background: #07c160;
+  border: none;
+  padding: 0px;
+
+  &:disabled {
+    background: #c0c4cc;
+    cursor: not-allowed;
+  }
+}
 </style>

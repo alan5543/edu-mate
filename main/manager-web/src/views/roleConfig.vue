@@ -707,15 +707,15 @@ export default {
 
       this.modelOptions["Intent"].forEach((item) => {
         if (item.value === "Intent_function_call") {
-          // 如果llmType是openai或ollama，允许选择function_call
+          // 如果llmType是openai、ollama或perplexity，允许选择function_call
           // 否则隐藏function_call选项
-          if (llmType === "openai" || llmType === "ollama") {
+          if (llmType === "openai" || llmType === "ollama" || llmType === "perplexity") {
             item.isHidden = false;
           } else {
             item.isHidden = true;
           }
         } else {
-          // 其他意图识别选项始终可见
+          //其他意图识别选项始终可见
           item.isHidden = false;
         }
       });
@@ -724,7 +724,8 @@ export default {
       if (
         this.form.model.intentModelId === "Intent_function_call" &&
         llmType !== "openai" &&
-        llmType !== "ollama"
+        llmType !== "ollama" &&
+        llmType !== "perplexity"
       ) {
         // 找到第一个可见的选项
         const firstVisibleOption = this.modelOptions["Intent"].find(

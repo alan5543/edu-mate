@@ -85,6 +85,8 @@ class LLMProvider(LLMProviderBase):
             log.bind(tag=TAG).info(
                 f"Gemini 代理设置成功 - HTTP: {http_proxy}, HTTPS: {https_proxy}"
             )
+        
+        log.bind(tag=TAG).info(f"Gemini Provider 初始化完成: model={self.model_name}")
         # 配置API密钥
         genai.configure(api_key=self.api_key)
 
@@ -126,6 +128,8 @@ class LLMProvider(LLMProviderBase):
         yield from self._generate(dialogue, self._build_tools(functions))
 
     def _generate(self, dialogue, tools):
+        # log.bind(tag=TAG).info(f"Gemini request dialogue: {json.dumps(dialogue, ensure_ascii=False)}")
+        
         role_map = {"assistant": "model", "user": "user"}
         contents: list = []
         # 拼接对话
@@ -164,22 +168,27 @@ class LLMProvider(LLMProviderBase):
                     "parts": [{"text": str(m.get("content", ""))}],
                 }
             )
-
-        stream: GenerateContentResponse = self.model.generate_content(
-            contents=contents,
-            generation_config=self.gen_cfg,
-            tools=tools,
-            stream=True,
-            timeout=self.timeout,
-        )
+        
+        log.bind(tag=TAG).info(f"Gemini generate_content input contents size: {len(contents)}")
+        # Too verbose to log full contents every time, but maybe useful for debugging
+        # log.bind(tag=TAG).debug(f"Gemini contents payload: {contents}")
 
         try:
+            stream: GenerateContentResponse = self.model.generate_content(
+                contents=contents,
+                generation_config=self.gen_cfg,
+                tools=tools,
+                stream=True,
+            )
+
             for chunk in stream:
+                # log.bind(tag=TAG).debug(f"Gemini chunk received: {chunk}")
                 cand = chunk.candidates[0]
                 for part in cand.content.parts:
                     # a) 函数调用-通常是最后一段话才是函数调用
                     if getattr(part, "function_call", None):
                         fc = part.function_call
+                        log.bind(tag=TAG).info(f"Gemini function call detected: {fc.name}")
                         yield None, [
                             SimpleNamespace(
                                 id=uuid.uuid4().hex,
@@ -195,8 +204,12 @@ class LLMProvider(LLMProviderBase):
                         return
                     # b) 普通文本
                     if getattr(part, "text", None):
+                        # log.bind(tag=TAG).debug(f"Gemini text part: {part.text}")
                         yield part.text if tools is None else (part.text, None)
 
+        except Exception as e:
+            log.bind(tag=TAG).error(f"Gemini generation error: {e}")
+            raise e
         finally:
             if tools is not None:
                 yield None, None  # function‑mode 结束，返回哑包

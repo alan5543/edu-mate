@@ -1,7 +1,6 @@
 <template>
   <div class="welcome">
-    <HeaderBar />
-
+    
     <div class="operation-bar">
       <h2 class="page-title">{{ $t("agentTemplateManagement.title") }}</h2>
       <div class="right-operations">
@@ -140,14 +139,10 @@
 </template>
 
 <script>
-import HeaderBar from "@/components/HeaderBar";
 import agentApi from "@/apis/module/agent";
 
 export default {
   name: "AgentTemplateManagement",
-  components: {
-    HeaderBar,
-  },
 
   data() {
     return {
@@ -437,7 +432,7 @@ export default {
 <style scoped lang="scss">
 /* 基础背景和布局设置 */
 .welcome {
-  min-height: 100vh;
+  min-height: 100%;
   display: flex;
   flex-direction: column;
   position: relative;

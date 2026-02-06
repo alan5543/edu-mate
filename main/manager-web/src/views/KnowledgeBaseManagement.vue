@@ -1,7 +1,6 @@
 <template>
   <div class="welcome">
-    <HeaderBar />
-
+    
     <div class="operation-bar">
       <h2 class="page-title">{{ $t('knowledgeBaseManagement.title') }}</h2>
       <div class="right-operations">
@@ -119,11 +118,10 @@
 
 <script>
 import Api from "@/apis/api";
-import HeaderBar from "@/components/HeaderBar.vue";
 import KnowledgeBaseDialog from "@/components/KnowledgeBaseDialog.vue";
 
 export default {
-  components: { HeaderBar, KnowledgeBaseDialog },
+  components: { KnowledgeBaseDialog },
   data() {
     return {
       searchName: "",
@@ -458,7 +456,7 @@ export default {
 .welcome {
     min-width: 900px;
     min-height: 506px;
-    height: 100vh;
+    height: 100%;
     display: flex;
     position: relative;
     flex-direction: column;

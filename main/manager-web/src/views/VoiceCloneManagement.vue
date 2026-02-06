@@ -1,6 +1,6 @@
 <template>
     <div class="welcome">
-        <HeaderBar />
+        
         <div class="operation-bar">
             <h2 class="page-title">{{ $t('voiceClone.title') }}</h2>
             <div class="right-operations">
@@ -124,12 +124,16 @@
 
 <script>
 import Api from "@/apis/api";
-import HeaderBar from "@/components/HeaderBar.vue";
 import VoiceCloneDialog from "@/components/VoiceCloneDialog.vue";
-import { formatDate } from "@/utils/format";
+import EditVoiceDialog from '@/components/EditVoiceDialog.vue'; // 引入编辑弹窗
+import AudioPlayer from '@/components/AudioPlayer.vue'; // 引入音频播放组件
 
 export default {
-    components: { HeaderBar, VoiceCloneDialog },
+    components: {
+        VoiceCloneDialog,
+        EditVoiceDialog,
+        AudioPlayer
+    },
     data() {
         return {
             searchName: "",
@@ -495,7 +499,7 @@ export default {
 .welcome {
     min-width: 900px;
     min-height: 506px;
-    height: 100vh;
+    height: 100%;
     display: flex;
     position: relative;
     flex-direction: column;

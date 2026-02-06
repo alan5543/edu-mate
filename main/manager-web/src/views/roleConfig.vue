@@ -1,6 +1,5 @@
 <template>
   <div class="welcome">
-    <HeaderBar />
 
     <div class="operation-bar">
       <h2 class="page-title">{{ $t("roleConfig.title") }}</h2>
@@ -303,13 +302,12 @@ import { getServiceUrl } from "@/apis/api";
 import RequestService from "@/apis/httpRequest";
 import FunctionDialog from "@/components/FunctionDialog.vue";
 import ContextProviderDialog from "@/components/ContextProviderDialog.vue";
-import HeaderBar from "@/components/HeaderBar.vue";
 import i18n from "@/i18n";
 import featureManager from "@/utils/featureManager"; 
 
 export default {
   name: "RoleConfigPage",
-  components: { HeaderBar, FunctionDialog, ContextProviderDialog },
+  components: { FunctionDialog, ContextProviderDialog },
   data() {
     return {
       showContextProviderDialog: false,
@@ -1050,7 +1048,7 @@ export default {
 <style scoped>
 .welcome {
   min-width: 900px;
-  height: 100vh;
+  height: 100%;
   display: flex;
   position: relative;
   flex-direction: column;

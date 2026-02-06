@@ -1,6 +1,6 @@
 <template>
     <div class="welcome">
-        <HeaderBar />
+        
 
         <div class="operation-bar">
             <h2 class="page-title">{{ $t('paramManagement.pageTitle') }}</h2>
@@ -103,10 +103,9 @@
 
 <script>
 import Api from "@/apis/api";
-import HeaderBar from "@/components/HeaderBar.vue";
 import ParamDialog from "@/components/ParamDialog.vue";
 export default {
-    components: { HeaderBar, ParamDialog },
+    components: { ParamDialog },
     data() {
         return {
             searchCode: "",
@@ -367,7 +366,7 @@ export default {
 .welcome {
     min-width: 900px;
     min-height: 506px;
-    height: 100vh;
+    height: 100%;
     display: flex;
     position: relative;
     flex-direction: column;

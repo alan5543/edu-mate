@@ -1,7 +1,6 @@
 <template>
   <div class="welcome">
-    <HeaderBar />
-
+    
     <div class="operation-bar">
       <h2 class="page-title">{{ $t('header.userManagement') }}</h2>
       <div class="right-operations">
@@ -97,11 +96,10 @@
 
 <script>
 import Api from "@/apis/api";
-import HeaderBar from "@/components/HeaderBar.vue";
-import ViewPasswordDialog from "@/components/ViewPasswordDialog.vue";
+import ChangePasswordDialog from "@/components/ChangePasswordDialog.vue";
 import i18n from '@/i18n';
 export default {
-  components: { HeaderBar, ViewPasswordDialog },
+  components: { ChangePasswordDialog },
   data() {
     return {
       showViewPassword: false,
@@ -367,7 +365,7 @@ export default {
 .welcome {
   min-width: 900px;
   min-height: 506px;
-  height: 100vh;
+  height: 100%;
   display: flex;
   position: relative;
   flex-direction: column;

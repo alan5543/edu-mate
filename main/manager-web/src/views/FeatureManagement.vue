@@ -1,7 +1,6 @@
 <template>
   <div class="welcome">
-    <HeaderBar />
-
+    
     <div class="operation-bar">
           <h2 class="page-title">{{ $t('header.featureManagement') }}</h2>
         </div>
@@ -97,13 +96,11 @@
 </template>
 
 <script>
-import HeaderBar from "@/components/HeaderBar.vue";
 import featureManager from "@/utils/featureManager.js";
 
 export default {
   name: "FeatureManagement",
   components: {
-    HeaderBar
   },
   data() {
     return {
@@ -329,7 +326,7 @@ export default {
 .welcome {
   min-width: 900px;
   min-height: 506px;
-  height: 100vh;
+  height: 100%;
   display: flex;
   position: relative;
   flex-direction: column;

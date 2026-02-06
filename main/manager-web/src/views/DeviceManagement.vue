@@ -1,7 +1,6 @@
 <template>
   <div class="welcome">
-    <HeaderBar />
-
+    
     <div class="operation-bar">
       <h2 class="page-title">{{ $t('device.management') }}</h2>
       <div class="right-operations">
@@ -126,12 +125,10 @@
 <script>
 import Api from '@/apis/api';
 import AddDeviceDialog from "@/components/AddDeviceDialog.vue";
-import HeaderBar from "@/components/HeaderBar.vue";
 import ManualAddDeviceDialog from "@/components/ManualAddDeviceDialog.vue";
 
 export default {
   components: {
-    HeaderBar,
     AddDeviceDialog,
     ManualAddDeviceDialog
   },
@@ -493,7 +490,7 @@ export default {
 .welcome {
   min-width: 900px;
   min-height: 506px;
-  height: 100vh;
+  height: 100%;
   display: flex;
   position: relative;
   flex-direction: column;

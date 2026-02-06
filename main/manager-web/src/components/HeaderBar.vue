@@ -1,142 +1,11 @@
 <template>
-  <el-header class="header">
+  <el-header class="header" :class="{ 'layout-header': isLayoutHeader }">
     <div class="header-container">
-      <!-- 左侧元素 -->
-      <div class="header-left" @click="goHome">
-        <img loading="lazy" alt="" src="@/assets/xiaozhi-logo.png" class="logo-img" />
-        <img loading="lazy" alt="" :src="xiaozhiAiIcon" class="brand-img" />
-      </div>
-
-      <!-- 中间导航菜单 -->
-      <div class="header-center">
-        <div class="equipment-management" :class="{
-          'active-tab':
-            $route.path === '/home' ||
-            $route.path === '/role-config' ||
-            $route.path === '/device-management',
-        }" @click="goHome">
-          <img loading="lazy" alt="" src="@/assets/header/robot.png" :style="{
-            filter:
-              $route.path === '/home' ||
-                $route.path === '/role-config' ||
-                $route.path === '/device-management'
-                ? 'brightness(0) invert(1)'
-                : 'None',
-          }" />
-          <span class="nav-text">{{ $t("header.smartManagement") }}</span>
-        </div>
-        <!-- 普通用户显示音色克隆 -->
-        <div v-if="!isSuperAdmin && featureStatus.voiceClone" class="equipment-management"
-          :class="{ 'active-tab': $route.path === '/voice-clone-management' }" @click="goVoiceCloneManagement">
-          <img loading="lazy" alt="" src="@/assets/header/voice.png" :style="{
-            filter:
-              $route.path === '/voice-clone-management'
-                ? 'brightness(0) invert(1)'
-                : 'None',
-          }" />
-          <span class="nav-text">{{ $t("header.voiceCloneManagement") }}</span>
-        </div>
-
-        <!-- 超级管理员显示音色克隆下拉菜单 -->
-        <el-dropdown v-if="isSuperAdmin && featureStatus.voiceClone" trigger="click" class="equipment-management more-dropdown" :class="{
-          'active-tab':
-            $route.path === '/voice-clone-management' ||
-            $route.path === '/voice-resource-management',
-        }" @visible-change="handleVoiceCloneDropdownVisibleChange">
-          <span class="el-dropdown-link">
-            <img loading="lazy" alt="" src="@/assets/header/voice.png" :style="{
-              filter:
-                $route.path === '/voice-clone-management' ||
-                  $route.path === '/voice-resource-management'
-                  ? 'brightness(0) invert(1)'
-                  : 'None',
-            }" />
-            <span class="nav-text">{{ $t("header.voiceCloneManagement") }}</span>
-            <i class="el-icon-arrow-down el-icon--right" :class="{ 'rotate-down': voiceCloneDropdownVisible }"></i>
-          </span>
-          <el-dropdown-menu slot="dropdown">
-            <el-dropdown-item @click.native="goVoiceCloneManagement">
-              {{ $t("header.voiceCloneManagement") }}
-            </el-dropdown-item>
-            <el-dropdown-item @click.native="goVoiceResourceManagement">
-              {{ $t("header.voiceResourceManagement") }}
-            </el-dropdown-item>
-          </el-dropdown-menu>
-        </el-dropdown>
-
-        <div v-if="isSuperAdmin" class="equipment-management" :class="{ 'active-tab': $route.path === '/model-config' }"
-          @click="goModelConfig">
-          <img loading="lazy" alt="" src="@/assets/header/model_config.png" :style="{
-            filter:
-              $route.path === '/model-config' ? 'brightness(0) invert(1)' : 'None',
-          }" />
-          <span class="nav-text">{{ $t("header.modelConfig") }}</span>
-        </div>
-        <div v-if="featureStatus.knowledgeBase" class="equipment-management"
-          :class="{ 'active-tab': $route.path === '/knowledge-base-management' || $route.path === '/knowledge-file-upload' }"
-          @click="goKnowledgeBaseManagement">
-          <img loading="lazy" alt="" src="@/assets/header/knowledge_base.png" :style="{
-            filter:
-              $route.path === '/knowledge-base-management' || $route.path === '/knowledge-file-upload' ? 'brightness(0) invert(1)' : 'None',
-          }" />
-          <span class="nav-text">{{ $t("header.knowledgeBase") }}</span>
-        </div>
-        <el-dropdown v-if="isSuperAdmin" trigger="click" class="equipment-management more-dropdown" :class="{
-          'active-tab':
-            $route.path === '/dict-management' ||
-            $route.path === '/params-management' ||
-            $route.path === '/provider-management' ||
-            $route.path === '/server-side-management' ||
-            $route.path === '/agent-template-management' ||
-            $route.path === '/ota-management' ||
-            $route.path === '/user-management' ||
-            $route.path === '/feature-management',
-        }" @visible-change="handleParamDropdownVisibleChange">
-          <span class="el-dropdown-link">
-            <img loading="lazy" alt="" src="@/assets/header/param_management.png" :style="{
-              filter:
-                $route.path === '/dict-management' ||
-                  $route.path === '/params-management' ||
-                  $route.path === '/provider-management' ||
-                  $route.path === '/server-side-management' ||
-                  $route.path === '/agent-template-management' ||
-                  $route.path === '/ota-management' ||
-                  $route.path === '/user-management' ||
-                  $route.path === '/feature-management'
-                  ? 'brightness(0) invert(1)'
-                  : 'None',
-            }" />
-            <span class="nav-text">{{ $t("header.paramDictionary") }}</span>
-            <i class="el-icon-arrow-down el-icon--right" :class="{ 'rotate-down': paramDropdownVisible }"></i>
-          </span>
-          <el-dropdown-menu slot="dropdown">
-            <el-dropdown-item @click.native="goParamManagement">
-              {{ $t("header.paramManagement") }}
-            </el-dropdown-item>
-            <el-dropdown-item @click.native="goUserManagement">
-              {{ $t("header.userManagement") }}
-            </el-dropdown-item>
-            <el-dropdown-item @click.native="goOtaManagement">
-              {{ $t("header.otaManagement") }}
-            </el-dropdown-item>
-            <el-dropdown-item @click.native="goDictManagement">
-              {{ $t("header.dictManagement") }}
-            </el-dropdown-item>
-            <el-dropdown-item @click.native="goProviderManagement">
-              {{ $t("header.providerManagement") }}
-            </el-dropdown-item>
-            <el-dropdown-item @click.native="goAgentTemplateManagement">
-              {{ $t("header.agentTemplate") }}
-            </el-dropdown-item>
-            <el-dropdown-item @click.native="goServerSideManagement">
-              {{ $t("header.serverSideManagement") }}
-            </el-dropdown-item>
-            <el-dropdown-item @click.native="goFeatureManagement">
-                {{ $t("header.featureManagement") }}
-              </el-dropdown-item>
-          </el-dropdown-menu>
-        </el-dropdown>
-      </div>
+      <!-- 左侧元素 (仅在非布局模式下显示，或者可以完全移除如果你只在MainLayout使用) -->
+      <!-- Refactor: Logo moved to Sidebar, removing from here -->
+      
+      <!-- 中间导航菜单 (Refactor: Moved to Sidebar) -->
+      <div class="header-center"></div>
 
       <!-- 右侧元素 -->
       <div class="header-right">
@@ -191,14 +60,22 @@ import userApi from "@/apis/module/user";
 import i18n, { changeLanguage } from "@/i18n";
 import { mapActions, mapGetters } from "vuex";
 import ChangePasswordDialog from "./ChangePasswordDialog.vue"; // 引入修改密码弹窗组件
-import featureManager from "@/utils/featureManager"; // 引入功能管理工具类
 
 export default {
   name: "HeaderBar",
   components: {
     ChangePasswordDialog,
   },
-  props: ["devices"], // 接收父组件设备列表
+  props: {
+    devices: {
+      type: Array,
+      default: () => []
+    },
+    isLayoutHeader: {
+      type: Boolean,
+      default: false
+    }
+  },
   data() {
     return {
       search: "",
@@ -207,8 +84,6 @@ export default {
         mobile: "",
       },
       isChangePasswordDialogVisible: false, // 控制修改密码弹窗的显示
-      paramDropdownVisible: false,
-      voiceCloneDropdownVisible: false,
       userMenuVisible: false, // 添加用户菜单可见状态
       isSmallScreen: false,
       // 搜索历史相关
@@ -222,11 +97,6 @@ export default {
         value: "value",
         label: "label",
         children: "children",
-      },
-      // 功能状态
-      featureStatus: {
-        voiceClone: false, // 音色克隆功能状态
-        knowledgeBase: false, // 知识库功能状态
       },
     };
   },
@@ -255,17 +125,6 @@ export default {
           return this.$t("language.vi");
         default:
           return this.$t("language.zhCN");
-      }
-    },
-    // 根据当前语言获取对应的xiaozhi-ai图标
-    xiaozhiAiIcon() {
-      const currentLang = this.currentLanguage;
-      switch (currentLang) {
-        case "zh_CN":
-        case "zh_TW":
-          return require("@/assets/edumate_ai_zh.png");
-        default:
-          return require("@/assets/edumate_ai_en.png");
       }
     },
     // 用户菜单选项
@@ -314,68 +173,12 @@ export default {
     window.addEventListener("resize", this.checkScreenSize);
     // 从localStorage加载搜索历史
     this.loadSearchHistory();
-    // 等待featureManager初始化完成后再加载功能状态
-    await this.loadFeatureStatus();
   },
   //移除事件监听器
   beforeDestroy() {
     window.removeEventListener("resize", this.checkScreenSize);
   },
   methods: {
-    goHome() {
-      // 跳转到首页
-      this.$router.push("/home");
-    },
-    goUserManagement() {
-      this.$router.push("/user-management");
-    },
-    goModelConfig() {
-      this.$router.push("/model-config");
-    },
-    goKnowledgeBaseManagement() {
-      this.$router.push("/knowledge-base-management");
-    },
-    goVoiceCloneManagement() {
-      this.$router.push("/voice-clone-management");
-    },
-    goParamManagement() {
-      this.$router.push("/params-management");
-    },
-    goOtaManagement() {
-      this.$router.push("/ota-management");
-    },
-    goDictManagement() {
-      this.$router.push("/dict-management");
-    },
-    goProviderManagement() {
-      this.$router.push("/provider-management");
-    },
-    goServerSideManagement() {
-      this.$router.push("/server-side-management");
-    },
-
-    // 跳转到音色资源管理
-    goVoiceResourceManagement() {
-      this.$router.push("/voice-resource-management");
-    },
-    // 添加默认角色模板管理导航方法
-    goAgentTemplateManagement() {
-      this.$router.push("/agent-template-management");
-    },
-    // 跳转到功能管理
-    goFeatureManagement() {
-      this.$router.push("/feature-management");
-    },
-    // 加载功能状态
-    async loadFeatureStatus() {
-      // 等待featureManager初始化完成
-      await featureManager.waitForInitialization();
-      
-      const config = featureManager.getConfig();
-      
-      this.featureStatus.voiceClone = config.voiceClone;
-      this.featureStatus.knowledgeBase = config.knowledgeBase;
-    },
     // 获取用户信息
     fetchUserInfo() {
       userApi.getUserInfo(({ data }) => {
@@ -394,7 +197,7 @@ export default {
 
       // 如果搜索内容为空，触发重置事件
       if (!searchValue) {
-        this.$emit("search-reset");
+        this.$eventBus.$emit("global-search-reset");
         return;
       }
 
@@ -402,7 +205,7 @@ export default {
       this.saveSearchHistory(searchValue);
 
       // 触发搜索事件，将搜索关键词传递给父组件
-      this.$emit("search", searchValue);
+      this.$eventBus.$emit("global-search", searchValue);
 
       // 搜索完成后让输入框失去焦点，从而触发blur事件隐藏搜索历史
       if (this.$refs.searchInput) {
@@ -506,15 +309,7 @@ export default {
         });
       }
     },
-    // 监听参数字典下拉菜单的可见状态变化
-    handleParamDropdownVisibleChange(visible) {
-      this.paramDropdownVisible = visible;
-    },
-
-    // 监听音色克隆下拉菜单的可见状态变化
-    handleVoiceCloneDropdownVisibleChange(visible) {
-      this.voiceCloneDropdownVisible = visible;
-    },
+    
     // 在data中添加一个key用于强制重新渲染组件
     // 处理 Cascader 选择变化
     handleCascaderChange(value) {
@@ -640,12 +435,16 @@ export default {
 
 <style lang="scss" scoped>
 .header {
-  background: #f6fcfe66;
-  border: 1px solid #fff;
-  height: 63px !important;
-  min-width: 900px;
-  /* 设置最小宽度防止过度压缩 */
-  overflow: visible;
+  height: 60px !important;
+  background: #fff;
+  border-bottom: 1px solid #f0f0f0;
+  padding: 0 20px;
+  
+  &.layout-header {
+    padding: 0 20px;
+    background: #fff;
+    box-shadow: 0 1px 4px rgba(0,21,41,.08);
+  }
 }
 
 .header-container {
@@ -653,78 +452,22 @@ export default {
   justify-content: space-between;
   align-items: center;
   height: 100%;
-  padding: 0 10px;
-}
-
-.header-left {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  min-width: 120px;
-  cursor: pointer;
-}
-
-.logo-img {
-  width: 42px;
-  height: 42px;
-}
-
-.brand-img {
-  height: 100px;
 }
 
 .header-center {
-  display: flex;
-  align-items: center;
-  gap: 25px;
-  position: absolute;
-  left: 50%;
-  transform: translateX(-50%);
+  flex: 1;
 }
 
 .header-right {
   display: flex;
   align-items: center;
-  gap: 7px;
-  min-width: 300px;
+  gap: 15px;
   justify-content: flex-end;
 }
 
-.equipment-management {
-  height: 30px;
-  border-radius: 15px;
-  background: #E1F3D8;
-  display: flex;
-  justify-content: center;
-  font-size: 14px;
-  font-weight: 500;
-  gap: 7px;
-  color: #3d4566;
-  margin-left: 1px;
-  align-items: center;
-  transition: all 0.3s ease;
-  cursor: pointer;
-  flex-shrink: 0;
-  /* 防止导航按钮被压缩 */
-  padding: 0 15px;
-  position: relative;
-}
-
-.equipment-management.active-tab {
-  background: #07c160 !important;
-  color: #fff !important;
-}
-
-.equipment-management img {
-  width: 15px;
-  height: 13px;
-}
-
 .search-container {
-  margin-right: 5px;
-  flex: 0.9;
-  min-width: 60px;
-  max-width: none;
+  margin-right: 15px;
+  width: 200px;
 }
 
 .search-wrapper {
@@ -789,106 +532,39 @@ export default {
   color: #909399;
   visibility: hidden;
 }
-.more-dropdown {
-  padding: 0;
+
+.avatar-img {
+  width: 32px;
+  height: 32px;
+  cursor: pointer;
+  border-radius: 50%;
 }
-.more-dropdown .el-dropdown-link {
+
+.el-user-dropdown {
+  cursor: pointer;
   display: flex;
   align-items: center;
-  gap: 7px;
+  gap: 5px;
+  font-size: 14px;
+  color: #333;
+}
+
+/* Fix search icon alignment */
+::v-deep .custom-search-input .el-input__suffix {
+  display: flex;
+  align-items: center;
   height: 100%;
-  padding: 0 15px;
+  top: 0;
 }
 
-.search-history-item:hover .clear-item-icon {
-  visibility: visible;
-}
-
-.clear-item-icon:hover {
-  color: #ff4949;
-}
-
-.custom-search-input>>>.el-input__inner {
-  height: 18px;
-  border-radius: 9px;
-  background-color: #fff;
-  border: 1px solid #e4e6ef;
-  padding-left: 8px;
-  font-size: 9px;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
-  width: 100%;
+::v-deep .custom-search-input .el-input__suffix-inner {
+  display: flex;
+  align-items: center;
 }
 
 .search-icon {
   cursor: pointer;
-  color: #909399;
-  margin-right: 3px;
-  font-size: 9px;
-  line-height: 18px;
-}
-
-.custom-search-input::v-deep .el-input__suffix-inner {
-  display: flex;
-  align-items: center;
-  height: 100%;
-}
-
-.avatar-img {
-  width: 21px;
-  height: 21px;
-  flex-shrink: 0;
-  cursor: pointer;
-}
-.el-user-dropdown {
-  cursor: pointer;
-}
-
-/* 导航文本样式 - 支持中英文换行 */
-.nav-text {
-  white-space: normal;
-  text-align: center;
-  max-width: 80px;
-  line-height: 1.2;
-}
-
-/* 响应式调整 */
-@media (max-width: 1200px) {
-  .header-center {
-    gap: 14px;
-  }
-
-  .equipment-management {
-    width: 79px;
-    font-size: 9px;
-  }
-}
-
-.equipment-management.more-dropdown {
-  position: relative;
-}
-
-.equipment-management.more-dropdown .el-dropdown-menu {
-  position: absolute;
-  right: 0;
-  min-width: 120px;
-  margin-top: 5px;
-}
-
-.el-dropdown-menu__item {
-  min-width: 60px;
-  padding: 8px 20px;
-  font-size: 14px;
-  color: #606266;
-  white-space: nowrap;
-}
-
-/* 添加倒三角旋转样式 */
-.rotate-down {
-  transform: rotate(180deg);
-  transition: transform 0.3s ease;
-}
-
-.el-icon-arrow-down {
-  transition: transform 0.3s ease;
+  font-size: 16px;
+  margin-right: 5px;
 }
 </style>

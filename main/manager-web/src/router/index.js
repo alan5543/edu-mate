@@ -3,7 +3,11 @@ import VueRouter from 'vue-router'
 
 Vue.use(VueRouter)
 
+// Import Layout
+import MainLayout from '@/layout/MainLayout.vue'
+
 const routes = [
+  // Authentication Routes (No Layout)
   {
     path: '/',
     name: 'welcome',
@@ -12,31 +16,10 @@ const routes = [
     }
   },
   {
-    path: '/role-config',
-    name: 'RoleConfig',
-    component: function () {
-      return import('../views/roleConfig.vue')
-    }
-  },
-  {
-    path: '/voice-print',
-    name: 'VoicePrint',
-    component: function () {
-      return import('../views/VoicePrint.vue')
-    }
-  },
-  {
     path: '/login',
     name: 'login',
     component: function () {
       return import('../views/login.vue')
-    }
-  },
-  {
-    path: '/home',
-    name: 'home',
-    component: function () {
-      return import('../views/home.vue')
     }
   },
   {
@@ -53,150 +36,175 @@ const routes = [
       return import('../views/retrievePassword.vue')
     }
   },
-  // 设备管理页面路由
-  {
-    path: '/device-management',
-    name: 'DeviceManagement',
-    component: function () {
-      return import('../views/DeviceManagement.vue')
-    }
-  },
-  // 添加用户管理路由
-  {
-    path: '/user-management',
-    name: 'UserManagement',
-    component: function () {
-      return import('../views/UserManagement.vue')
-    }
-  },
-  {
-    path: '/model-config',
-    name: 'ModelConfig',
-    component: function () {
-      return import('../views/ModelConfig.vue')
-    }
-  },
-  {
-    path: '/params-management',
-    name: 'ParamsManagement',
-    component: function () {
-      return import('../views/ParamsManagement.vue')
-    },
-    meta: {
-      requiresAuth: true,
-      title: '参数管理'
-    }
-  },
-  {
-    path: '/knowledge-base-management',
-    name: 'KnowledgeBaseManagement',
-    component: function () {
-      return import('../views/KnowledgeBaseManagement.vue')
-    },
-    meta: {
-      requiresAuth: true,
-      title: '知识库管理'
-    }
-  },
-  {
-    path: '/knowledge-file-upload',
-    name: 'KnowledgeFileUpload',
-    component: function () {
-      return import('../views/KnowledgeFileUpload.vue')
-    },
-    meta: {
-      requiresAuth: true,
-      title: '文档上传管理'
-    }
-  },
 
+  // Dashboard Routes (With MainLayout)
   {
-    path: '/server-side-management',
-    name: 'ServerSideManager',
-    component: function () {
-      return import('../views/ServerSideManager.vue')
-    },
-    meta: {
-      requiresAuth: true,
-      title: '服务端管理'
-    }
-  },
-  {
-    path: '/ota-management',
-    name: 'OtaManagement',
-    component: function () {
-      return import('../views/OtaManagement.vue')
-    },
-    meta: {
-      requiresAuth: true,
-      title: 'OTA管理'
-    }
-  },
-  {
-    path: '/voice-resource-management',
-    name: 'VoiceResourceManagement',
-    component: function () {
-      return import('../views/VoiceResourceManagement.vue')
-    },
-    meta: {
-      requiresAuth: true,
-      title: '音色资源开通'
-    }
-  },
-  {
-    path: '/voice-clone-management',
-    name: 'VoiceCloneManagement',
-    component: function () {
-      return import('../views/VoiceCloneManagement.vue')
-    },
-    meta: {
-      requiresAuth: true,
-      title: '音色克隆管理'
-    }
-  },
-  {
-    path: '/dict-management',
-    name: 'DictManagement',
-    component: function () {
-      return import('../views/DictManagement.vue')
-    }
-  },
-  {
-    path: '/provider-management',
-    name: 'ProviderManagement',
-    component: function () {
-      return import('../views/ProviderManagement.vue')
-    }
-  },
-  // 添加默认角色管理路由
-  {
-    path: '/agent-template-management',
-    name: 'AgentTemplateManagement',
-    component: function () {
-      return import('../views/AgentTemplateManagement.vue')
-    }
-  },
-  // 添加模板快速配置路由
-  {
-    path: '/template-quick-config',
-    name: 'TemplateQuickConfig',
-    component: function () {
-      return import('../views/TemplateQuickConfig.vue')
-    }
-  },
-  // 功能配置页面路由
-  {
-    path: '/feature-management',
-    name: 'FeatureManagement',
-    component: function () {
-      return import('../views/FeatureManagement.vue')
-    },
-    meta: {
-      requiresAuth: true,
-      title: '功能配置'
-    }
-  },
+    path: '/',
+    component: MainLayout,
+    children: [
+      {
+        path: 'home',
+        name: 'home',
+        component: function () {
+          return import('../views/home.vue')
+        }
+      },
+      {
+        path: 'role-config',
+        name: 'RoleConfig',
+        component: function () {
+          return import('../views/roleConfig.vue')
+        }
+      },
+      {
+        path: 'voice-print',
+        name: 'VoicePrint',
+        component: function () {
+          return import('../views/VoicePrint.vue')
+        }
+      },
+      {
+        path: 'device-management',
+        name: 'DeviceManagement',
+        component: function () {
+          return import('../views/DeviceManagement.vue')
+        }
+      },
+      {
+        path: 'user-management',
+        name: 'UserManagement',
+        component: function () {
+          return import('../views/UserManagement.vue')
+        }
+      },
+      {
+        path: 'model-config',
+        name: 'ModelConfig',
+        component: function () {
+          return import('../views/ModelConfig.vue')
+        }
+      },
+      {
+        path: 'params-management',
+        name: 'ParamsManagement',
+        component: function () {
+          return import('../views/ParamsManagement.vue')
+        },
+        meta: {
+          requiresAuth: true,
+          title: '参数管理'
+        }
+      },
+      {
+        path: 'knowledge-base-management',
+        name: 'KnowledgeBaseManagement',
+        component: function () {
+          return import('../views/KnowledgeBaseManagement.vue')
+        },
+        meta: {
+          requiresAuth: true,
+          title: '知识库管理'
+        }
+      },
+      {
+        path: 'knowledge-file-upload',
+        name: 'KnowledgeFileUpload',
+        component: function () {
+          return import('../views/KnowledgeFileUpload.vue')
+        },
+        meta: {
+          requiresAuth: true,
+          title: '文档上传管理'
+        }
+      },
+      {
+        path: 'server-side-management',
+        name: 'ServerSideManager',
+        component: function () {
+          return import('../views/ServerSideManager.vue')
+        },
+        meta: {
+          requiresAuth: true,
+          title: '服务端管理'
+        }
+      },
+      {
+        path: 'ota-management',
+        name: 'OtaManagement',
+        component: function () {
+          return import('../views/OtaManagement.vue')
+        },
+        meta: {
+          requiresAuth: true,
+          title: 'OTA管理'
+        }
+      },
+      {
+        path: 'voice-resource-management',
+        name: 'VoiceResourceManagement',
+        component: function () {
+          return import('../views/VoiceResourceManagement.vue')
+        },
+        meta: {
+          requiresAuth: true,
+          title: '音色资源开通',
+          activeMenu: '/voice-clone-management' // Highlight voice clone menu
+        }
+      },
+      {
+        path: 'voice-clone-management',
+        name: 'VoiceCloneManagement',
+        component: function () {
+          return import('../views/VoiceCloneManagement.vue')
+        },
+        meta: {
+          requiresAuth: true,
+          title: '音色克隆管理'
+        }
+      },
+      {
+        path: 'dict-management',
+        name: 'DictManagement',
+        component: function () {
+          return import('../views/DictManagement.vue')
+        }
+      },
+      {
+        path: 'provider-management',
+        name: 'ProviderManagement',
+        component: function () {
+          return import('../views/ProviderManagement.vue')
+        }
+      },
+      {
+        path: 'agent-template-management',
+        name: 'AgentTemplateManagement',
+        component: function () {
+          return import('../views/AgentTemplateManagement.vue')
+        }
+      },
+      {
+        path: 'template-quick-config',
+        name: 'TemplateQuickConfig',
+        component: function () {
+          return import('../views/TemplateQuickConfig.vue')
+        }
+      },
+      {
+        path: 'feature-management',
+        name: 'FeatureManagement',
+        component: function () {
+          return import('../views/FeatureManagement.vue')
+        },
+        meta: {
+          requiresAuth: true,
+          title: '功能配置'
+        }
+      },
+    ]
+  }
 ]
+
 const router = new VueRouter({
   base: process.env.VUE_APP_PUBLIC_PATH || '/',
   routes
@@ -222,7 +230,7 @@ const protectedRoutes = ['home', 'RoleConfig', 'DeviceManagement', 'UserManageme
 // 路由守卫
 router.beforeEach((to, from, next) => {
   // 检查是否是需要保护的路由
-  if (protectedRoutes.includes(to.name)) {
+  if (protectedRoutes.includes(to.name) || to.matched.some(record => record.meta.requiresAuth)) {
     // 从localStorage获取token
     const token = localStorage.getItem('token')
     if (!token) {

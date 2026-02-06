@@ -1,7 +1,7 @@
 <template>
   <div class="welcome">
     <!-- 公共头部 -->
-    <HeaderBar :devices="devices" @search="handleSearch" @search-reset="handleSearchReset" />
+    
     <el-main style="padding: 20px;display: flex;flex-direction: column;">
       <div>
         <!-- 首页内容 -->
@@ -59,12 +59,11 @@ import Api from '@/apis/api';
 import AddWisdomBodyDialog from '@/components/AddWisdomBodyDialog.vue';
 import ChatHistoryDialog from '@/components/ChatHistoryDialog.vue';
 import DeviceItem from '@/components/DeviceItem.vue';
-import HeaderBar from '@/components/HeaderBar.vue';
 import featureManager from '@/utils/featureManager';
 
 export default {
   name: 'HomePage',
-  components: { DeviceItem, AddWisdomBodyDialog, HeaderBar, ChatHistoryDialog },
+  components: { DeviceItem, AddWisdomBodyDialog, ChatHistoryDialog },
   data() {
     return {
       addDeviceDialogVisible: false,
@@ -89,6 +88,15 @@ export default {
   async mounted() {
     this.fetchAgentList();
     await this.loadFeatureStatus();
+    
+    // Listen to global search events
+    this.$eventBus.$on('global-search', this.handleSearch);
+    this.$eventBus.$on('global-search-reset', this.handleSearchReset);
+  },
+
+  beforeDestroy() {
+    this.$eventBus.$off('global-search', this.handleSearch);
+    this.$eventBus.$off('global-search-reset', this.handleSearchReset);
   },
 
   methods: {
@@ -207,7 +215,7 @@ export default {
 .welcome {
   min-width: 900px;
   min-height: 506px;
-  height: 100vh;
+  height: 100%;
   display: flex;
   flex-direction: column;
   background: linear-gradient(135deg, #f0f9f0 0%, #e6f7e9 100%);

@@ -1,7 +1,6 @@
 <template>
   <div class="welcome">
-    <HeaderBar />
-
+    
     <div class="operation-bar">
       <h2 class="page-title">{{ $t('templateQuickConfig.title') }}</h2>
     </div>
@@ -57,7 +56,6 @@
 </template>
 
 <script>
-import HeaderBar from "@/components/HeaderBar.vue";
 import agentApi from '@/apis/module/agent';
 
 // 默认模型配置常量
@@ -73,7 +71,7 @@ const DEFAULT_MODEL_CONFIG = {
 
 export default {
   name: 'TemplateQuickConfig',
-  components: { HeaderBar },
+  components: { },
   data() {
     return {
       form: {
@@ -261,7 +259,7 @@ export default {
 <style scoped>
 .welcome {
   min-width: 900px;
-  height: 100vh;
+  height: 100%;
   display: flex;
   position: relative;
   flex-direction: column;

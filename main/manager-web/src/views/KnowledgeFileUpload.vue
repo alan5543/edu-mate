@@ -1,7 +1,6 @@
 <template>
   <div class="welcome">
-    <HeaderBar />
-
+    
     <div class="operation-bar">
       <div class="left-operations">
         <el-button class="btn-back" type="text" @click="$router.back()">
@@ -263,10 +262,8 @@
 <script>
 import Api from "@/apis/api";
 import KnowledgeBaseAPI from "@/apis/module/knowledgeBase";
-import HeaderBar from "@/components/HeaderBar.vue";
 
 export default {
-  components: { HeaderBar },
   data() {
     return {
       datasetId: '',
@@ -1113,7 +1110,7 @@ export default {
 .welcome {
   min-width: 900px;
   min-height: 506px;
-  height: 100vh;
+  height: 100%;
   display: flex;
   position: relative;
   flex-direction: column;

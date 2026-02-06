@@ -1,7 +1,6 @@
 <template>
     <div class="welcome">
-        <HeaderBar />
-
+        
         <div class="operation-bar">
             <h2 class="page-title">{{ $t('voicePrint.pageTitle') }}</h2>
         </div>
@@ -45,10 +44,9 @@
 
 <script>
 import Api from "@/apis/api";
-import HeaderBar from "@/components/HeaderBar.vue";
 import VoicePrintDialog from "@/components/VoicePrintDialog.vue";
 export default {
-    components: { HeaderBar, VoicePrintDialog },
+    components: { VoicePrintDialog },
     data() {
         return {
             voicePrintList: [],
@@ -188,7 +186,7 @@ export default {
 .welcome {
     min-width: 900px;
     min-height: 506px;
-    height: 100vh;
+    height: 100%;
     display: flex;
     position: relative;
     flex-direction: column;

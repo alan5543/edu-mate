@@ -1,7 +1,6 @@
 <template>
     <div class="welcome">
-        <HeaderBar />
-
+        
         <div class="operation-bar">
             <h2 class="page-title">{{ $t('dictManagement.pageTitle') }}</h2>
             <div class="action-group">
@@ -127,11 +126,9 @@
 import dictApi from '@/apis/module/dict'
 import DictDataDialog from '@/components/DictDataDialog.vue'
 import DictTypeDialog from '@/components/DictTypeDialog.vue'
-import HeaderBar from '@/components/HeaderBar.vue'
 export default {
     name: 'DictManagement',
     components: {
-        HeaderBar,
         DictTypeDialog,
         DictDataDialog
     },
@@ -446,7 +443,7 @@ export default {
 .welcome {
     min-width: 900px;
     min-height: 506px;
-    height: 100vh;
+    height: 100%;
     display: flex;
     position: relative;
     flex-direction: column;

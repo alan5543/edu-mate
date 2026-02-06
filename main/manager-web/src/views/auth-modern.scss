@@ -1,0 +1,426 @@
+// Modern Authentication Styles with Glassmorphism
+// Animated gradient background with particle effects
+
+@keyframes gradient-shift {
+    0% {
+        background-position: 0% 50%;
+    }
+
+    50% {
+        background-position: 100% 50%;
+    }
+
+    100% {
+        background-position: 0% 50%;
+    }
+}
+
+@keyframes float {
+
+    0%,
+    100% {
+        transform: translateY(0px);
+    }
+
+    50% {
+        transform: translateY(-20px);
+    }
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes shimmer {
+    0% {
+        background-position: -1000px 0;
+    }
+
+    100% {
+        background-position: 1000px 0;
+    }
+}
+
+.welcome {
+    min-width: 100vw;
+    min-height: 100vh;
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    overflow: hidden;
+
+    // Animated gradient background
+    background: linear-gradient(135deg,
+            #667eea 0%,
+            #764ba2 25%,
+            #f093fb 50%,
+            #4facfe 75%,
+            #667eea 100%);
+    background-size: 400% 400%;
+    animation: gradient-shift 15s ease infinite;
+
+    // Overlay pattern for depth
+    &::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-image:
+            radial-gradient(circle at 20% 50%, rgba(255, 255, 255, 0.1) 0%, transparent 50%),
+            radial-gradient(circle at 80% 80%, rgba(255, 255, 255, 0.1) 0%, transparent 50%),
+            radial-gradient(circle at 40% 20%, rgba(139, 92, 246, 0.2) 0%, transparent 50%);
+        pointer-events: none;
+    }
+
+    // Floating particles
+    &::after {
+        content: '';
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        background-image:
+            radial-gradient(2px 2px at 20% 30%, white, transparent),
+            radial-gradient(2px 2px at 60% 70%, white, transparent),
+            radial-gradient(1px 1px at 50% 50%, white, transparent),
+            radial-gradient(1px 1px at 80% 10%, white, transparent),
+            radial-gradient(2px 2px at 90% 60%, white, transparent),
+            radial-gradient(1px 1px at 33% 80%, white, transparent),
+            radial-gradient(1px 1px at 66% 33%, white, transparent);
+        background-size: 200% 200%;
+        opacity: 0.4;
+        animation: float 20s ease-in-out infinite;
+    }
+}
+
+.auth-header {
+    position: absolute;
+    top: 30px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    z-index: 10;
+    animation: fadeInUp 0.6s ease-out;
+
+    img {
+        filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.15));
+    }
+}
+
+.login-text {
+    font-weight: 700;
+    font-size: 28px;
+    text-align: center;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 8px;
+    letter-spacing: -0.5px;
+}
+
+.login-welcome {
+    font-weight: 400;
+    font-size: 14px;
+    text-align: center;
+    color: #64748b;
+    margin-bottom: 30px;
+}
+
+.login-box {
+    position: relative;
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-radius: 24px;
+    padding: 48px 40px;
+    width: 480px;
+    max-width: 90vw;
+    box-sizing: border-box;
+    box-shadow:
+        0 8px 32px rgba(0, 0, 0, 0.1),
+        0 2px 8px rgba(0, 0, 0, 0.05),
+        inset 0 1px 0 rgba(255, 255, 255, 0.8);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    animation: fadeInUp 0.8s ease-out 0.2s both;
+    z-index: 5;
+
+    // Subtle shimmer effect on hover
+    &::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg,
+                transparent,
+                rgba(255, 255, 255, 0.3),
+                transparent);
+        transition: left 0.5s;
+    }
+
+    &:hover::before {
+        left: 100%;
+    }
+}
+
+.title-language-dropdown {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    z-index: 10;
+}
+
+.current-language-text {
+    font-size: 13px;
+    color: #475569;
+    font-weight: 500;
+}
+
+.el-dropdown-link {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding: 8px 12px;
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.5);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    cursor: pointer;
+    transition: all 0.3s ease;
+
+    &:hover {
+        background: rgba(255, 255, 255, 0.8);
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+}
+
+.input-box {
+    position: relative;
+    display: flex;
+    align-items: center;
+    margin-top: 24px;
+    border-radius: 12px;
+    background: #f8fafc;
+    border: 2px solid #e2e8f0;
+    height: 56px;
+    padding: 0 18px;
+    gap: 12px;
+    transition: all 0.3s ease;
+
+    &:focus-within {
+        border-color: #8b5cf6;
+        background: #ffffff;
+        box-shadow: 0 0 0 4px rgba(139, 92, 246, 0.1);
+        transform: translateY(-2px);
+    }
+
+    &:hover:not(:focus-within) {
+        border-color: #cbd5e1;
+        background: #ffffff;
+    }
+}
+
+.input-icon {
+    width: 20px;
+    height: 20px;
+    flex-shrink: 0;
+    opacity: 0.6;
+    transition: opacity 0.3s ease;
+
+    .input-box:focus-within & {
+        opacity: 1;
+    }
+}
+
+.login-btn {
+    height: 52px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-radius: 12px;
+    font-weight: 600;
+    font-size: 16px;
+    cursor: pointer;
+    color: #fff;
+    line-height: 52px;
+    margin: 32px 0 24px 0;
+    text-align: center;
+    box-shadow: 0 4px 16px rgba(102, 126, 234, 0.4);
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+
+    &::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg,
+                transparent,
+                rgba(255, 255, 255, 0.3),
+                transparent);
+        transition: left 0.5s;
+    }
+
+    &:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 24px rgba(102, 126, 234, 0.5);
+
+        &::before {
+            left: 100%;
+        }
+    }
+
+    &:active {
+        transform: translateY(0);
+    }
+}
+
+.login-type-container {
+    margin: 20px 0;
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+
+    .el-button {
+        transition: all 0.3s ease;
+
+        &:hover {
+            transform: translateY(-2px);
+        }
+    }
+}
+
+.send-captcha-btn {
+    min-width: 120px;
+    height: 56px;
+    border-radius: 12px;
+    font-size: 14px;
+    font-weight: 600;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border: none;
+    padding: 0 20px;
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+    transition: all 0.3s ease;
+
+    &:hover:not(:disabled) {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 16px rgba(102, 126, 234, 0.4);
+    }
+
+    &:disabled {
+        background: linear-gradient(135deg, #cbd5e1 0%, #94a3b8 100%);
+        cursor: not-allowed;
+        box-shadow: none;
+    }
+}
+
+// Element UI overrides for modern look
+::v-deep {
+    .el-input__inner {
+        border: none;
+        background-color: transparent;
+        height: 56px;
+        padding: 0;
+        font-size: 15px;
+        color: #1e293b;
+
+        &::placeholder {
+            color: #94a3b8;
+        }
+
+        &:focus {
+            background-color: transparent;
+        }
+    }
+
+    .el-input__suffix {
+        display: flex;
+        align-items: center;
+    }
+
+    .el-button--primary {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border: none;
+
+        &:hover,
+        &:focus {
+            background: linear-gradient(135deg, #5568d3 0%, #6a3f8f 100%);
+        }
+
+        &:active {
+            background: linear-gradient(135deg, #4a5bc4 0%, #5d3680 100%);
+        }
+    }
+
+    .el-select {
+        .el-input__inner {
+            padding-left: 12px;
+        }
+    }
+
+    .el-dropdown-menu {
+        border-radius: 12px;
+        border: 1px solid #e2e8f0;
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+        padding: 8px;
+
+        .el-dropdown-menu__item {
+            border-radius: 8px;
+            padding: 10px 16px;
+            transition: all 0.2s ease;
+
+            &:hover {
+                background: #f1f5f9;
+                color: #8b5cf6;
+            }
+        }
+    }
+
+
+    .el-tooltip__popper {
+        border-radius: 8px;
+    }
+}
+
+// Responsive adjustments
+@media (max-width: 768px) {
+    .login-box {
+        width: 95vw;
+        padding: 36px 24px;
+    }
+
+    .auth-header {
+        top: 20px;
+    }
+
+    .login-text {
+        font-size: 24px;
+    }
+}
+
+// Rotate animation for dropdown arrow
+.rotate-down {
+    transform: rotate(180deg);
+    transition: transform 0.3s ease;
+}
+
+.el-icon-arrow-down {
+    transition: transform 0.3s ease;
+}

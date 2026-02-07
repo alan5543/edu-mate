@@ -39,7 +39,7 @@ export default {
 
 <style lang="scss" scoped>
 .app-wrapper {
-  display: flex;
+  /* display: flex; <- Removed to fix whitespace on right side */
   height: 100%;
   width: 100%;
   
@@ -59,13 +59,13 @@ export default {
   .main-container {
     min-height: 100%;
     transition: margin-left 0.28s;
-    margin-left: 210px;
+    margin-left: 240px; /* Adjusted to 240px */
     position: relative;
-    width: 100%;
+    /* width: 100%; <- Removed to fix overflow */
     background-color: #f0f2f5;
     
     &.collapsed {
-      margin-left: 64px;
+      margin-left: 75px;
     }
   }
 

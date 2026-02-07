@@ -228,7 +228,7 @@ export default {
 <style lang="scss" scoped>
 .sidebar-container {
   transition: width 0.28s;
-  width: 210px;
+  width: 240px;
   background-color: #ffffff;
   height: 100vh;
   position: fixed;
@@ -238,17 +238,21 @@ export default {
   left: 0;
   z-index: 1001;
   overflow: hidden;
-  box-shadow: 2px 0 6px rgba(0, 0, 0, 0.05);
+  box-shadow: 2px 0 8px rgba(0, 0, 0, 0.05); /* Enhanced shadow */
   display: flex;
   flex-direction: column;
 
   &.collapsed {
-    width: 64px;
+    width: 75px;
     
     .logo-container {
       padding: 0;
       justify-content: center;
       
+      .logo-img {
+        margin-right: 0; /* Center logo when collapsed */
+      }
+
       .brand-img {
         display: none;
       }
@@ -256,22 +260,24 @@ export default {
   }
 
   .logo-container {
-    height: 80px; /* Increased from 60px */
+    height: 80px;
     display: flex;
     align-items: center;
     padding: 0 20px;
     cursor: pointer;
-    border-bottom: 1px solid #f0f0f0;
+    /* border-bottom: 1px solid #f0f0f0; Removed for cleaner look */
     
     .logo-img {
-      width: 40px; /* Slightly larger logo icon */
+      width: 40px; /* Adjusted to 40px for better balance with 240px width */
       height: 40px;
       margin-right: 12px;
+      flex-shrink: 0;
     }
     
     .brand-img {
-      height: 50px; /* Increased from 40px */
+      height: 80px; /* Increased to 80px as requested */
       object-fit: contain;
+      transition: opacity 0.3s;
     }
   }
 
@@ -290,7 +296,7 @@ export default {
     width: 100% !important;
     
     &:not(.el-menu--collapse) {
-      width: 210px;
+      width: 240px; /* Updated width */
     }
 
     /* Enhance menu item styling */
@@ -298,17 +304,31 @@ export default {
     ::v-deep .el-submenu__title {
       height: 50px;
       line-height: 50px;
-      margin: 4px 0;
+      margin: 4px 12px; /* Margin for pill shape */
+      border-radius: 8px; /* Rounded corners */
+      transition: all 0.3s ease;
       
       i {
         font-size: 18px;
         margin-right: 10px;
         color: #909399;
+        transition: color 0.3s;
+      }
+      
+      span {
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        display: inline-block;
+        vertical-align: middle;
+        max-width: 160px; /* Adjusted max-width */
+        font-size: 14px;
       }
       
       &.is-active {
-        background-color: #e6f7e9 !important; /* Light green background for active */
-        border-right: 3px solid #07c160;
+        background-color: rgba(7, 193, 96, 0.1) !important; /* Subtle green bg */
+        color: #07c160 !important;
+        font-weight: 600;
         
         i {
           color: #07c160;
@@ -317,12 +337,22 @@ export default {
       
       &:hover {
         background-color: #f5f7fa !important;
+        color: #303133 !important;
+        
+        i {
+          color: #303133;
+        }
+      }
+    }
+    
+    /* Ensure active item hover state keeps green color */
+    ::v-deep .el-menu-item.is-active:hover {
+        background-color: rgba(7, 193, 96, 0.15) !important;
         color: #07c160 !important;
         
         i {
           color: #07c160;
         }
-      }
     }
   }
 
@@ -332,9 +362,10 @@ export default {
     align-items: center;
     justify-content: center;
     cursor: pointer;
-    border-top: 1px solid #f0f0f0;
+    /* border-top: 1px solid #f0f0f0; Removed */
     color: #909399;
     font-size: 20px;
+    transition: all 0.3s;
     
     &:hover {
       background-color: #f9f9f9;

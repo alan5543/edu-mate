@@ -3,9 +3,9 @@
     <el-container style="height: 100%;">
       <!-- 保持相同的头部 -->
       <el-header>
-        <div style="display: flex;align-items: center;margin-top: 15px;margin-left: 10px;gap: 10px;">
-          <img loading="lazy" alt="" src="@/assets/xiaozhi-logo.png" style="width: 45px;height: 45px;" />
-          <img loading="lazy" alt="" :src="xiaozhiAiIcon" style="height: 100px;" />
+        <div class="logo-container">
+          <img loading="lazy" alt="" src="@/assets/xiaozhi-logo.png" class="logo-icon" />
+          <img loading="lazy" alt="" :src="xiaozhiAiIcon" class="logo-text" />
         </div>
       </el-header>
       <div class="login-person">
@@ -42,7 +42,7 @@
                 </div>
 
                 <div style="display: flex; align-items: center; margin-top: 20px; width: 100%; gap: 10px;">
-                  <div class="input-box" style="width: calc(100% - 130px); margin-top: 0;">
+                  <div class="input-box" style="flex: 1; margin-top: 0;">
                     <img loading="lazy" alt="" class="input-icon" src="@/assets/login/shield.png" />
                     <el-input v-model="form.captcha" :placeholder="$t('register.captchaPlaceholder')"
                       style="flex: 1;" />
@@ -85,7 +85,7 @@
               <!-- 验证码部分保持相同 -->
               <div v-if="!enableMobileRegister"
                 style="display: flex; align-items: center; margin-top: 20px; width: 100%; gap: 10px;">
-                <div class="input-box" style="width: calc(100% - 130px); margin-top: 0;">
+                <div class="input-box" style="flex: 1; margin-top: 0;">
                   <img loading="lazy" alt="" class="input-icon" src="@/assets/login/shield.png" />
                   <el-input v-model="form.captcha" :placeholder="$t('register.captchaPlaceholder')" style="flex: 1;" />
                 </div>

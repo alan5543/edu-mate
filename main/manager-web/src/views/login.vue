@@ -2,15 +2,9 @@
   <div class="welcome">
     <el-container style="height: 100%">
       <el-header>
-        <div style="
-            display: flex;
-            align-items: center;
-            margin-top: 11px;
-            margin-left: 11px;
-            gap: 10px;
-          ">
-          <img loading="lazy" alt="" src="@/assets/xiaozhi-logo.png" style="width: 42px; height: 42px" />
-          <img loading="lazy" alt="" :src="xiaozhiAiIcon" style="height: 100px" />
+        <div class="logo-container">
+          <img loading="lazy" alt="" src="@/assets/xiaozhi-logo.png" class="logo-icon" />
+          <img loading="lazy" alt="" :src="xiaozhiAiIcon" class="logo-text" />
         </div>
       </el-header>
       <div class="login-person">
@@ -91,9 +85,9 @@
                 width: 100%;
                 gap: 10px;
               ">
-              <div class="input-box" style="width: calc(100% - 130px); margin-top: 0">
+              <div class="input-box" style="flex: 1; margin-top: 0">
                 <img loading="lazy" alt="" class="input-icon" src="@/assets/login/shield.png" />
-                <el-input v-model="form.captcha" :placeholder="$t('login.captchaPlaceholder')" style="flex: 1" />
+                <el-input v-model="form.captcha" :placeholder="$t('login.captchaPlaceholder')" style="width: 100%" />
               </div>
               <img loading="lazy" v-if="captchaUrl" :src="captchaUrl" alt="验证码"
                 style="width: 150px; height: 40px; cursor: pointer" @click="fetchCaptcha" />

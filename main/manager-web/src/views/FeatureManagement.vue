@@ -324,7 +324,7 @@ export default {
 
 <style scoped>
 .welcome {
-  min-width: 900px;
+  width: 100%;
   min-height: 506px;
   height: 100%;
   display: flex;
@@ -344,9 +344,21 @@ export default {
   padding: 16px 24px;
 }
 
+@media (max-width: 768px) {
+  .operation-bar {
+    padding: 12px 16px;
+  }
+}
+
 .page-title {
   font-size: 24px;
   margin: 0;
+}
+
+@media (max-width: 768px) {
+  .page-title {
+    font-size: 20px;
+  }
 }
 
 .config-header {
@@ -354,6 +366,13 @@ export default {
   align-items: center;
   justify-content: space-between;
   padding: 0 0 16px 0;
+}
+
+@media (max-width: 768px) {
+  .config-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
 }
 
 .header-icon {
@@ -377,6 +396,16 @@ export default {
   align-items: center;
   gap: 8px;
   margin-left: auto;
+}
+
+@media (max-width: 768px) {
+  .header-actions {
+    margin-left: 0;
+    margin-top: 12px;
+    width: 100%;
+    flex-wrap: wrap;
+    justify-content: flex-start;
+  }
 }
 
 .divider {
@@ -431,12 +460,21 @@ export default {
   border-radius: 15px;
   min-height: calc(100vh - 24vh);
   height: auto;
-  max-height: 80vh;
+  /* max-height: 80vh; Removed to allow natural growth */
   box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
   position: relative;
   background: rgba(237, 242, 255, 0.5);
   display: flex;
   flex-direction: column;
+  overflow: hidden; /* Ensure border-radius clips */
+}
+
+@media (max-width: 768px) {
+  .main-wrapper {
+    margin: 5px 10px;
+    /* max-height: calc(100vh - 100px); Removed */
+    min-height: auto;
+  }
 }
 
 .content-panel {
@@ -452,21 +490,21 @@ export default {
 .content-area {
   flex: 1;
   height: 100%;
-  min-width: 600px;
-  overflow: auto;
+  width: 100%;
+  overflow-y: auto; /* Ensure vertical scrolling */
   background-color: white;
-  display: flex;
-  flex-direction: column;
+  display: block;
 }
 
 .feature-card {
   background: white;
-  flex: 1;
+  min-height: 100%;
+  height: auto;
   display: flex;
   flex-direction: column;
   border: none;
   box-shadow: none;
-  overflow: hidden;
+  padding-bottom: 40px; /* Add padding to prevent cut-off */
 }
 
 .feature-card ::v-deep .el-card__body {
@@ -474,13 +512,27 @@ export default {
   display: flex;
   flex-direction: column;
   flex: 1;
-  overflow: hidden;
+  overflow: visible;
+  height: auto;
+}
+
+@media (max-width: 768px) {
+  .feature-card ::v-deep .el-card__body {
+    padding: 16px;
+    overflow: visible;
+  }
 }
 
 .features-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
   gap: 16px;
+}
+
+@media (max-width: 480px) {
+  .features-grid {
+     grid-template-columns: 1fr;
+  }
 }
 
 .feature-card-item {
@@ -554,6 +606,14 @@ export default {
   gap: 32px;
   align-items: flex-start;
   position: relative;
+  /* removed overflow-y: auto */
+}
+
+@media (max-width: 768px) {
+  .feature-groups-container {
+    flex-direction: column;
+    gap: 20px;
+  }
 }
 
 /* 分组之间的分隔线 */
@@ -564,10 +624,16 @@ export default {
   top: 0;
   bottom: 0;
   width: 1px;
-  height: 550px;
+  height: 100%;
   background: #e0e0e0;
   opacity: 0.5;
   transform: translateX(-50%);
+}
+
+@media (max-width: 768px) {
+  .feature-groups-container::before {
+    display: none;
+  }
 }
 
 /* 分组样式 */
@@ -575,6 +641,13 @@ export default {
   flex: 1;
   min-width: 0;
   margin-bottom: 32px;
+}
+
+@media (max-width: 768px) {
+  .feature-group {
+    width: 100%;
+    margin-bottom: 20px;
+  }
 }
 
 .group-title {

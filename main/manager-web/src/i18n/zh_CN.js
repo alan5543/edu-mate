@@ -419,6 +419,7 @@ export default {
 
   // 设备管理页面文本
   'device.management': '设备管理',
+  'device.statusDesc': '管理和监控您的已连接设备',
   'device.add': '添加设备',
   'device.edit': '编辑设备',
   'device.delete': '删除设备',
@@ -656,6 +657,7 @@ export default {
   'common.cancel': '取消',
   'common.sensitive': '敏感',
   'common.loading': '加载中',
+  'common.noData': '暂无数据',
 
   // 语言切换
   'language.zhCN': '中文简体',
@@ -683,6 +685,17 @@ export default {
   'home.deleteSuccess': '删除成功',
   'home.deleteFailed': '删除失败',
   'home.enableMemory': '请先在“配置角色”界面开启记忆',
+  'home.goodMorning': '早上好',
+  'home.goodAfternoon': '下午好',
+  'home.goodEvening': '晚上好',
+  'home.totalAgents': '智能体',
+  'home.devices': '设备',
+  'home.noAgents': '暂无智能体',
+  'home.createFirstAgent': '创建你的第一个AI智能体开始使用！',
+  'home.noSearchResults': '未找到智能体',
+  'home.tryDifferentSearch': '尝试其他搜索词',
+  'home.clearSearch': '清除搜索',
+  'home.noDescription': '暂无描述',
 
   // 参数管理页面文本
   'paramManagement.pageTitle': '参数管理',
@@ -743,10 +756,17 @@ export default {
   'addAgentDialog.cancel': '取消',
   'addAgentDialog.nameRequired': '请输入智能体名称',
   'addAgentDialog.addSuccess': '添加成功',
+  'addAgentDialog.subtitle': '为您的AI智能体起一个名字',
 
   // 角色配置页面文本
   'roleConfig.title': '角色配置',
   'roleConfig.restartNotice': '保存配置后，需要重启设备，新的配置才会生效。',
+  'roleConfig.audioPlayError': '音频播放时发生错误',
+  'roleConfig.basicInfo': '基本信息',
+  'roleConfig.basicInfoDesc': '配置智能体的名称、性格和行为',
+  'roleConfig.modelConfig': '模型配置',
+  'roleConfig.modelConfigDesc': '选择为智能体提供能力的AI模型',
+  'roleConfig.templateDesc': '使用预配置模板快速开始',
   'roleConfig.saveConfig': '保存配置',
   'roleConfig.reset': '重置',
   'roleConfig.agentName': '助手昵称',
@@ -1049,6 +1069,8 @@ export default {
   'agentTemplateManagement.deleteFailed': '模板删除失败',
   'agentTemplateManagement.batchDeleteFailed': '模板批量删除失败',
   'agentTemplateManagement.deleteBackendError': '删除失败，请检查后端服务是否正常',
+  'agentTemplateManagement.createFirst': '开始创建您的第一个智能体模板。',
+  'agentTemplateManagement.fetchTemplateFailed': '获取模板列表失败',
 
   // 模板快速配置页面文本
   'templateQuickConfig.title': '模块快速配置',

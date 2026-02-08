@@ -1,125 +1,161 @@
 <template>
-    <div class="welcome">
-        
-        <div class="operation-bar">
-            <h2 class="page-title">{{ $t('dictManagement.pageTitle') }}</h2>
-            <div class="action-group">
-                <div class="search-group">
-                    <el-input :placeholder="$t('dictManagement.searchPlaceholder')" v-model="search" class="search-input" clearable
-                        @keyup.enter.native="handleSearch" style="width: 240px" />
-                    <el-button class="btn-search" @click="handleSearch">
-                        {{ $t('dictManagement.search') }}
-                    </el-button>
-                </div>
-            </div>
-        </div>
-
-        <!-- 主体内容 -->
-        <div class="main-wrapper">
-            <div class="content-panel">
-                <!-- 左侧字典类型列表 -->
-                <div class="dict-type-panel">
-                    <div class="dict-type-header">
-                        <el-button type="success" size="mini" @click="showAddDictTypeDialog">{{ $t('dictManagement.addDictType') }}</el-button>
-                        <el-button type="danger" size="mini" @click="batchDeleteDictType"
-                            :disabled="selectedDictTypes.length === 0">
-                            {{ $t('dictManagement.batchDeleteDictType') }}
-                        </el-button>
-                    </div>
-                    <el-table ref="dictTypeTable" :data="dictTypeList" style="width: 100%" v-loading="dictTypeLoading"
-                        element-loading-text="拼命加载中" element-loading-spinner="el-icon-loading"
-                        element-loading-background="rgba(255, 255, 255, 0.7)" @row-click="handleDictTypeRowClick"
-                        @selection-change="handleDictTypeSelectionChange" :row-class-name="tableRowClassName"
-                        class="dict-type-table" :header-cell-class-name="headerCellClassName">
-                        <el-table-column type="selection" width="70" align="center" :cell-class-name="selectionCellClassName"></el-table-column>
-                        <el-table-column :label="$t('dictManagement.dictTypeName')" prop="dictName" align="center"></el-table-column>
-                        <el-table-column :label="$t('dictManagement.operation')" width="100" align="center">
-                            <template slot-scope="scope">
-                                <el-button type="text" size="mini" @click.stop="editDictType(scope.row)">{{ $t('dictManagement.edit') }}</el-button>
-                            </template>
-                        </el-table-column>
-                    </el-table>
-                </div>
-
-                <!-- 右侧字典数据列表 -->
-                <div class="content-area">
-                    <el-card class="dict-data-card" shadow="never">
-                        <el-table ref="dictDataTable" :data="dictDataList" style="width: 100%"
-                            v-loading="dictDataLoading" element-loading-text="拼命加载中"
-                            element-loading-spinner="el-icon-loading"
-                            element-loading-background="rgba(255, 255, 255, 0.7)" class="data-table"
-                            header-row-class-name="table-header">
-                            <el-table-column :label="$t('modelConfig.select')" align="center" width="70">
-                                <template slot-scope="scope">
-                                    <el-checkbox v-model="scope.row.selected"></el-checkbox>
-                                </template>
-                            </el-table-column>
-                            <el-table-column :label="$t('dictManagement.dictLabel')" prop="dictLabel" align="center"></el-table-column>
-                            <el-table-column :label="$t('dictManagement.dictValue')" prop="dictValue" align="center"></el-table-column>
-                            <el-table-column :label="$t('dictManagement.sort')" prop="sort" align="center"></el-table-column>
-                            <el-table-column :label="$t('dictManagement.operation')" align="center" width="180px">
-                                <template slot-scope="scope">
-                                    <el-button type="text" size="mini" @click="editDictData(scope.row)"
-                                        class="edit-btn">
-                                        {{ $t('dictManagement.edit') }}
-                                    </el-button>
-                                    <el-button type="text" size="mini" @click="deleteDictData(scope.row)"
-                                        class="delete-btn">
-                                        {{ $t('dictManagement.delete') }}
-                                    </el-button>
-                                </template>
-                            </el-table-column>
-                        </el-table>
-                        <div class="table-footer">
-                            <div class="batch-actions">
-                                <el-button size="mini" type="primary" @click="selectAllDictData">
-                                    {{ isAllDictDataSelected ? $t('dictManagement.deselectAll') : $t('dictManagement.selectAll') }}
-                                </el-button>
-                                <el-button type="success" size="mini" @click="showAddDictDataDialog" class="add-btn">
-                                    {{ $t('dictManagement.addDictData') }}
-                                </el-button>
-                                <el-button size="mini" type="danger" icon="el-icon-delete" @click="batchDeleteDictData">
-                                    {{ $t('dictManagement.batchDeleteDictData') }}
-                                </el-button>
-                            </div>
-                            <div class="custom-pagination">
-                                <el-select v-model="pageSize" @change="handlePageSizeChange" class="page-size-select">
-                                    <el-option v-for="item in pageSizeOptions" :key="item" :label="$t('dictManagement.itemsPerPage', { items: item })"
-                                        :value="item">
-                                    </el-option>
-                                </el-select>
-
-                                <button class="pagination-btn" :disabled="currentPage === 1" @click="goFirst">
-                                    {{ $t('dictManagement.firstPage') }}
-                                </button>
-                                <button class="pagination-btn" :disabled="currentPage === 1" @click="goPrev">
-                                    {{ $t('dictManagement.prevPage') }}
-                                </button>
-                                <button v-for="page in visiblePages" :key="page" class="pagination-btn"
-                                    :class="{ active: page === currentPage }" @click="goToPage(page)">
-                                    {{ page }}
-                                </button>
-                                <button class="pagination-btn" :disabled="currentPage === pageCount" @click="goNext">
-                                    {{ $t('dictManagement.nextPage') }}
-                                </button>
-                                <span class="total-text">{{ $t('dictManagement.totalRecords', { total }) }}</span>
-                            </div>
-                        </div>
-                    </el-card>
-                </div>
-            </div>
-        </div>
-
-        <!-- 使用字典类型编辑弹框组件 -->
-        <DictTypeDialog :visible.sync="dictTypeDialogVisible" :title="dictTypeDialogTitle" :dictTypeData="dictTypeForm"
-            @save="saveDictType" />
-
-        <!-- 使用字典数据编辑弹框组件 -->
-        <DictDataDialog :visible.sync="dictDataDialogVisible" :title="dictDataDialogTitle" :dictData="dictDataForm"
-            :dictTypeId="selectedDictType?.id" @save="saveDictData" />
-        <el-footer style="flex-shrink:unset;">
-        </el-footer>
+  <div class="dict-management-page">
+    <!-- Header Section -->
+    <div class="page-header">
+      <div class="header-content">
+        <h1 class="page-title">{{ $t('dictManagement.pageTitle') }}</h1>
+        <p class="page-subtitle">{{ $t('header.paramDictionary') }}</p>
+      </div>
     </div>
+
+    <!-- Main Content -->
+    <div class="content-container">
+      <!-- Left Panel: Dict Types -->
+      <div class="left-panel card">
+        <div class="panel-header">
+          <span class="panel-title">{{ $t('dictManagement.dictTypeName') }}</span>
+          <div class="panel-actions">
+            <el-tooltip :content="$t('dictManagement.addDictType')" placement="top">
+              <el-button 
+                type="primary" 
+                size="mini" 
+                icon="el-icon-plus" 
+                circle 
+                class="action-btn"
+                @click="showAddDictTypeDialog"
+              ></el-button>
+            </el-tooltip>
+            <el-tooltip :content="$t('dictManagement.batchDeleteDictType')" placement="top">
+              <el-button 
+                type="danger" 
+                size="mini" 
+                icon="el-icon-delete" 
+                circle 
+                class="action-btn"
+                @click="batchDeleteDictType" 
+                :disabled="selectedDictTypes.length === 0"
+              ></el-button>
+            </el-tooltip>
+          </div>
+        </div>
+        
+        <div class="panel-content">
+          <el-table 
+            ref="dictTypeTable" 
+            :data="dictTypeList" 
+            v-loading="dictTypeLoading"
+            :element-loading-text="$t('common.loading')" 
+            style="width: 100%"
+            height="100%"
+            @row-click="handleDictTypeRowClick"
+            @selection-change="handleDictTypeSelectionChange" 
+            :row-class-name="tableRowClassName"
+            class="custom-table" 
+            :header-cell-class-name="headerCellClassName"
+          >
+            <el-table-column type="selection" width="50" align="center" :cell-class-name="selectionCellClassName"></el-table-column>
+            <el-table-column prop="dictName" :label="$t('dictManagement.dictTypeName')" show-overflow-tooltip></el-table-column>
+            <el-table-column width="60" align="center">
+              <template slot-scope="scope">
+                <el-button type="text" size="mini" class="edit-text-btn" icon="el-icon-edit" @click.stop="editDictType(scope.row)"></el-button>
+              </template>
+            </el-table-column>
+          </el-table>
+        </div>
+      </div>
+
+      <!-- Right Panel: Dict Data -->
+      <div class="right-panel card">
+        <div class="toolbar">
+          <div class="search-wrapper">
+            <el-input 
+              :placeholder="$t('dictManagement.searchPlaceholder')" 
+              v-model="search" 
+              prefix-icon="el-icon-search"
+              clearable
+              class="search-input"
+              @keyup.enter.native="handleSearch"
+              @clear="handleSearch"
+            >
+            </el-input>
+          </div>
+          <div class="toolbar-actions">
+            <el-button type="primary" icon="el-icon-plus" class="create-btn" @click="showAddDictDataDialog">
+              {{ $t('dictManagement.addDictData') }}
+            </el-button>
+            <el-button type="danger" icon="el-icon-delete" class="delete-btn" @click="batchDeleteDictData">
+              {{ $t('dictManagement.batchDeleteDictData') }}
+            </el-button>
+          </div>
+        </div>
+
+        <div class="data-table-wrapper">
+          <el-table 
+            ref="dictDataTable" 
+            :data="dictDataList" 
+            v-loading="dictDataLoading" 
+            :element-loading-text="$t('common.loading')"
+            style="width: 100%"
+            height="100%"
+            class="custom-table"
+            header-row-class-name="table-header"
+          >
+            <!-- Using manual selection as per original logic to avoid breaking scripts -->
+            <el-table-column :label="$t('modelConfig.select')" align="center" width="70">
+                <template slot-scope="scope">
+                    <el-checkbox v-model="scope.row.selected"></el-checkbox>
+                </template>
+            </el-table-column>
+            
+            <el-table-column :label="$t('dictManagement.dictLabel')" prop="dictLabel" align="center"></el-table-column>
+            <el-table-column :label="$t('dictManagement.dictValue')" prop="dictValue" align="center"></el-table-column>
+            <el-table-column :label="$t('dictManagement.sort')" prop="sort" align="center" width="80"></el-table-column>
+            <el-table-column :label="$t('dictManagement.operation')" align="center" width="180">
+              <template slot-scope="scope">
+                <el-button type="text" size="mini" class="edit-text-btn" @click="editDictData(scope.row)">
+                  {{ $t('dictManagement.edit') }}
+                </el-button>
+                <el-button type="text" class="delete-text-btn" size="mini" @click="deleteDictData(scope.row)">
+                  {{ $t('dictManagement.delete') }}
+                </el-button>
+              </template>
+            </el-table-column>
+          </el-table>
+        </div>
+
+        <div class="pagination-footer">
+          <div class="batch-select-action">
+             <el-button size="mini" @click="selectAllDictData">{{ isAllDictDataSelected ? $t('dictManagement.deselectAll') : $t('dictManagement.selectAll') }}</el-button>
+          </div>
+          <el-pagination
+            background
+            :current-page.sync="currentPage"
+            :page-sizes="pageSizeOptions"
+            :page-size="pageSize"
+            layout="total, sizes, prev, pager, next"
+            :total="total"
+            @size-change="handlePageSizeChange"
+            @current-change="goToPage"
+          />
+        </div>
+      </div>
+    </div>
+
+    <!-- Dialogs -->
+    <DictTypeDialog 
+      :visible.sync="dictTypeDialogVisible" 
+      :title="dictTypeDialogTitle" 
+      :dictTypeData="dictTypeForm"
+      @save="saveDictType" 
+    />
+    <DictDataDialog 
+      :visible.sync="dictDataDialogVisible" 
+      :title="dictDataDialogTitle" 
+      :dictData="dictDataForm"
+      :dictTypeId="selectedDictType && selectedDictType.id" 
+      @save="saveDictData" 
+    />
+  </div>
 </template>
 
 <script>
@@ -439,468 +475,235 @@ export default {
 }
 </script>
 
-<style lang="scss" scoped>
-.welcome {
-    min-width: 900px;
-    min-height: 506px;
-    height: 100%;
-    display: flex;
-    position: relative;
-    flex-direction: column;
-    background-size: cover;
-    background: linear-gradient(135deg, #f0f9f0 0%, #e6f7e9 100%) center;
-    -webkit-background-size: cover;
-    -o-background-size: cover;
-    overflow: hidden;
-}
+<style scoped lang="scss">
+$primary: #07c160;
+$primary-hover: #06ad56;
+$text-primary: #101828;
+$text-secondary: #344054;
+$text-muted: #667085;
+$border-color: #eaecf0;
+$bg-page: #f9fafb;
+$bg-white: #ffffff;
+$danger: #f56c6c;
 
-.main-wrapper {
-    margin: 5px 22px;
-    border-radius: 15px;
-    min-height: calc(100vh - 24vh);
+.dict-management-page {
+  padding: 0; /* MainLayout provides padding */
+  background-color: transparent;
+  height: calc(100vh - 108px); /* 100vh - header(60) - layout padding(48) */
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+  overflow: hidden;
+
+  @media (max-width: 640px) {
     height: auto;
-    max-height: 80vh;
-    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
-    position: relative;
-    background: rgba(240, 249, 240, 0.5);
-    display: flex;
-    flex-direction: column;
+    overflow: visible;
+  }
 }
 
-.operation-bar {
+.page-header {
+  margin-bottom: 24px;
+  flex-shrink: 0; /* Prevent header from shrinking */
+  .header-content {
+    .page-title {
+      font-size: 26px;
+      font-weight: 700;
+      color: $text-primary;
+      margin: 0 0 6px 0;
+      
+      @media (max-width: 640px) {
+        font-size: 22px;
+      }
+    }
+    .page-subtitle {
+      color: $text-muted;
+      font-size: 15px;
+      margin: 0;
+    }
+  }
+}
+
+.content-container {
+  display: flex;
+  gap: 24px;
+  flex: 1;
+  min-height: 0; /* Critical for nested flex scrolling */
+  overflow: hidden;
+
+  @media (max-width: 768px) {
+    flex-direction: column;
+    overflow: visible; /* Allow scrolling on mobile */
+    height: auto;
+  }
+}
+
+.card {
+  background: $bg-white;
+  border-radius: 16px;
+  border: 1px solid $border-color;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  height: 100%; /* Ensure card takes full height of container */
+}
+
+.left-panel {
+  width: 320px;
+  flex-shrink: 0;
+  height: 100%;
+
+  @media (max-width: 768px) {
+    width: 100%;
+    height: 400px; /* Fixed height for mobile view list */
+    min-height: 400px;
+  }
+
+  .panel-header {
+    padding: 16px 20px;
+    border-bottom: 1px solid $border-color;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 16px 24px;
+
+    .panel-title {
+        font-weight: 600;
+        color: $text-primary;
+        font-size: 16px;
+    }
+
+    .panel-actions {
+        display: flex;
+        gap: 8px;
+    }
+  }
+
+  .panel-content {
+     flex: 1;
+     overflow: hidden;
+  }
 }
 
-.page-title {
-    font-size: 24px;
-    margin: 0;
-}
-
-.action-group {
+.right-panel {
+  flex: 1;
+  min-width: 0;
+  
+  .toolbar {
+    padding: 16px 20px;
+    border-bottom: 1px solid $border-color;
     display: flex;
+    justify-content: space-between;
     align-items: center;
     gap: 16px;
-}
 
-.search-group {
-    display: flex;
-    gap: 10px;
-}
-
-.search-input {
-    width: 240px;
-}
-
-.btn-search {
-    background: linear-gradient(135deg, #07c160, #06ad56);
-    border: none;
-    color: white;
-}
-
-.btn-search:hover {
-    opacity: 0.9;
-    transform: translateY(-1px);
-}
-
-:deep(.search-input .el-input__inner) {
-    border-radius: 4px;
-    border: 1px solid #DCDFE6;
-    background-color: white;
-    transition: border-color 0.2s;
-}
-
-:deep(.search-input .el-input__inner:focus) {
-    border-color: #07c160;
-    outline: none;
-}
-
-.content-panel {
-    flex: 1;
-    display: flex;
-    overflow: hidden;
-    height: 100%;
-    border-radius: 15px;
-    background: transparent;
-    border: 1px solid #fff;
-}
-
-.dict-type-panel {
-    width: 300px;
-    background: white;
-    border-right: 1px solid #ebeef5;
-    display: flex;
-    flex-direction: column;
-}
-
-.dict-type-header {
-    padding: 16px;
-    border-bottom: 1px solid #ebeef5;
-    display: flex;
-    gap: 8px;
-}
-
-.dict-type-table {
-    flex: 1;
-    overflow-y: auto;
-}
-
-.content-area {
-    flex: 1;
-    padding: 24px;
-    height: 100%;
-    min-width: 600px;
-    overflow: hidden;
-    background-color: white;
-    display: flex;
-    flex-direction: column;
-}
-
-.dict-data-card {
-    background: white;
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    border: none;
-    box-shadow: none;
-    overflow: hidden;
-}
-
-.data-table {
-    border-radius: 6px;
-    overflow-y: hidden;
-    background-color: transparent !important;
-    --table-max-height: calc(100vh - 40vh);
-    max-height: var(--table-max-height);
-
-    :deep(.el-table__body-wrapper) {
-        max-height: calc(var(--table-max-height) - 40px);
-        overflow-y: auto;
+    @media (max-width: 640px) {
+        flex-direction: column;
+        align-items: stretch;
     }
+  }
 
-    :deep(.el-table__body) {
-        tr:last-child td {
-            border-bottom: none;
-        }
-    }
-}
-
-:deep(.el-table) {
-    &::before {
-        display: none;
-    }
-
-    &::after {
-        display: none;
-    }
-}
-
-.table-footer {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 16px 0;
-    width: 100%;
-    flex-shrink: 0;
-    min-height: 60px;
-    background: white;
-    margin-top: 10px;
-}
-
-.batch-actions {
-    display: flex;
-    gap: 8px;
-    padding-left: 26px;
-
-    .el-button {
-        min-width: 72px;
-        height: 32px;
-        padding: 7px 12px 7px 10px;
-        font-size: 12px;
-        border-radius: 4px;
-        line-height: 1;
-        font-weight: 500;
-        border: none;
-        transition: all 0.3s ease;
-        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
-
-        &:hover {
-            transform: translateY(-1px);
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
-        }
-    }
-
-    .el-button--primary {
-        background: #07c160;
-        color: white;
-    }
-
-    .el-button--success {
-        background: #5bc98c;
-        color: white;
-    }
-
-    .el-button--danger {
-        background: #fd5b63;
-        color: white;
-    }
-}
-
-.custom-pagination {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-
-    .el-select {
-        margin-right: 8px;
-    }
-
-    .pagination-btn:first-child,
-    .pagination-btn:nth-child(2),
-    .pagination-btn:nth-child(3),
-    .pagination-btn:nth-last-child(2) {
-        min-width: 60px;
-        height: 32px;
-        padding: 0 12px;
-        border-radius: 4px;
-        border: 1px solid #e4e7ed;
-        background: #f0f9f0;
-        color: #606266;
-        font-size: 14px;
-        cursor: pointer;
-        transition: all 0.3s ease;
-
-        &:hover {
-            background: #d7dce6;
-        }
-
-        &:disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
-        }
-    }
-
-    .pagination-btn:not(:first-child):not(:nth-child(2)):not(:nth-child(3)):not(:nth-last-child(2)) {
-        min-width: 28px;
-        height: 32px;
-        padding: 0;
-        border-radius: 4px;
-        border: 1px solid transparent;
-        background: transparent;
-        color: #606266;
-        font-size: 14px;
-        cursor: pointer;
-        transition: all 0.3s ease;
-
-        &:hover {
-            background: rgba(245, 247, 250, 0.3);
-        }
-    }
-
-    .pagination-btn.active {
-        background: #07c160 !important;
-        color: #ffffff !important;
-        border-color: #07c160 !important;
-
-        &:hover {
-            background: #06ad56 !important;
-        }
-    }
-
-    .total-text {
-        color: #909399;
-        font-size: 14px;
-        margin-left: 10px;
-    }
-}
-
-.page-size-select {
-    width: 100px;
-    margin-right: 10px;
-
-    :deep(.el-input__inner) {
-        height: 32px;
-        line-height: 32px;
-        border-radius: 4px;
-        border: 1px solid #e4e7ed;
-        background: #f0f9f0;
-        color: #606266;
-        font-size: 14px;
-    }
-
-    :deep(.el-input__suffix) {
-        right: 6px;
-        width: 15px;
-        height: 20px;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        top: 6px;
-        border-radius: 4px;
-    }
-
-    :deep(.el-input__suffix-inner) {
-        display: flex;
-        align-items: center;
-        justify-content: center;
+  .search-wrapper {
+    width: 280px;
+    @media (max-width: 640px) {
         width: 100%;
     }
+  }
 
-    :deep(.el-icon-arrow-up:before) {
-        content: "";
-        display: inline-block;
-        border-left: 6px solid transparent;
-        border-right: 6px solid transparent;
-        border-top: 9px solid #606266;
-        position: relative;
-        transform: rotate(0deg);
-        transition: transform 0.3s;
+  .data-table-wrapper {
+      flex: 1;
+      overflow: hidden;
+      padding: 0;
+  }
+
+  .pagination-footer {
+      padding: 16px 20px;
+      border-top: 1px solid $border-color;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+
+      @media (max-width: 640px) {
+          flex-direction: column;
+          gap: 10px;
+      }
+  }
+}
+
+/* Button & Input Overrides */
+::v-deep .el-input__inner {
+    border-radius: 10px;
+    height: 40px;
+    line-height: 40px;
+    border: 1px solid $border-color;
+    &:focus {
+        border-color: $primary;
     }
 }
 
-.edit-btn,
+.create-btn {
+    background: $primary;
+    border-color: $primary;
+    border-radius: 10px;
+    font-weight: 600;
+    &:hover {
+        background: $primary-hover;
+        border-color: $primary-hover;
+    }
+}
+
 .delete-btn {
-    margin: 0 8px;
-    color: #07c160 !important;
-    font-size: 12px;
-    padding: 7px 12px;
-    height: 32px;
-    line-height: 1;
-    border-radius: 4px;
-    transition: all 0.3s ease;
-
-    &:hover {
-        color: #06ad56 !important;
-        transform: translateY(-1px);
-    }
+    border-radius: 10px;
 }
 
-:deep(.dict-type-header .el-button) {
-    min-width: 72px;
-    height: 32px;
-    padding: 7px 12px 7px 10px;
-    font-size: 12px;
-    border-radius: 4px;
-    line-height: 1;
-    font-weight: 500;
-    border: none;
-    transition: all 0.3s ease;
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
-
+.action-btn {
+    transition: all 0.2s;
     &:hover {
         transform: translateY(-1px);
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
-    }
-
-    &.el-button--success {
-        background: #5bc98c;
-        color: white;
-    }
-
-    &.el-button--danger {
-        background: #fd5b63;
-        color: white;
     }
 }
 
-:deep(.el-table .cell) {
-    padding-left: 10px;
-    padding-right: 10px;
+.edit-text-btn {
+    color: $primary;
+    &:hover {
+        color: $primary-hover;
+    }
 }
 
-:deep(.el-loading-mask) {
-    background-color: rgba(255, 255, 255, 0.6) !important;
-    backdrop-filter: blur(2px);
+.delete-text-btn {
+    color: $danger;
+    &:hover {
+        color: darken($danger, 10%);
+    }
 }
 
-:deep(.el-loading-spinner .circular) {
-    width: 28px;
-    height: 28px;
+/* Table overrides */
+.custom-table {
+    ::v-deep .el-table__header-wrapper th {
+        background-color: #f8fafc;
+        color: $text-secondary;
+        font-weight: 600;
+        height: 48px;
+    }
+    ::v-deep .el-table__row {
+        td {
+            padding: 8px 0;
+        }
+        &.current-row > td {
+            background-color: transparentize($primary, 0.9) !important;
+        }
+    }
 }
 
-:deep(.el-loading-spinner .path) {
-    stroke: #07c160;
+/* Scrollbar styling */
+::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
 }
-
-:deep(.el-loading-text) {
-    color: #07c160 !important;
-    font-size: 14px;
-    margin-top: 8px;
+::-webkit-scrollbar-thumb {
+    background: #d1d5db;
+    border-radius: 3px;
 }
-
-:deep(.dict-type-table .el-table__row) {
-    cursor: pointer;
-}
-
-:deep(.dict-type-table .el-table__row.current-row) {
-    background-color: #07c160 !important;
-    color: white;
-}
-
-:deep(.dict-type-table .el-table__row.current-row .el-button--text) {
-    color: white !important;
-}
-
-:deep(.dict-type-table .el-table__row:hover) {
-    background-color: #f5f7fa;
-}
-
-:deep(.dict-type-table .el-table__row.current-row:hover) {
-    background-color: #07c160 !important;
-}
-
-:deep(.dict-type-table .el-table__row td) {
-    background-color: transparent !important;
-}
-
-::v-deep .el-table .custom-selection-header .cell .el-checkbox__inner {
-    display: none !important;
-}
-
-::v-deep .el-table .custom-selection-header .cell::before {
-    content: attr(data-content);
-    display: block;
-    text-align: center;
-    line-height: 32px;
-    color: black;
-    margin-top: 0;
-    height: 32px;
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    width: 100%;
-}
-
-.custom-selection-header .cell {
-    position: relative;
-}
-
-:deep(.el-table thead) {
-    color: #000000;
-}
-
-:deep(.el-card__body) {
-    padding: 15px;
-    display: flex;
-    flex-direction: column;
-    flex: 1;
-    overflow: hidden;
-}
-
-:deep(.el-checkbox__inner) {
-    background-color: #eeeeee !important;
-    border-color: #cccccc !important;
-}
-
-:deep(.el-checkbox__inner:hover) {
-    border-color: #cccccc !important;
-}
-
-:deep(.el-checkbox__input.is-checked .el-checkbox__inner) {
-    background-color: #07c160 !important;
-    border-color: #07c160 !important;
+::-webkit-scrollbar-track {
+    background: transparent;
 }
 </style>

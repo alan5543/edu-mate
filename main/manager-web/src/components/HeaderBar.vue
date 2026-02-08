@@ -1,10 +1,12 @@
 <template>
   <el-header class="header" :class="{ 'layout-header': isLayoutHeader }">
     <div class="header-container">
-      <!-- 左侧元素 (仅在非布局模式下显示，或者可以完全移除如果你只在MainLayout使用) -->
-      <!-- Refactor: Logo moved to Sidebar, removing from here -->
-      
-      <!-- 中间导航菜单 (Refactor: Moved to Sidebar) -->
+      <!-- Mobile hamburger menu -->
+      <div v-if="isMobile" class="hamburger-btn" @click="$emit('toggle-mobile-menu')">
+        <i class="el-icon-s-fold"></i>
+      </div>
+
+      <!-- 中间导航菜单 (Spacing) -->
       <div class="header-center"></div>
 
       <!-- 右侧元素 -->
@@ -35,11 +37,13 @@
           </div>
         </div>
 
-        <img loading="lazy" alt="" src="@/assets/home/avatar.png" class="avatar-img" @click="handleAvatarClick" />
-        <span class="el-user-dropdown" @click="handleAvatarClick">
-          {{ userInfo.username || "加载中..." }}
-          <i class="el-icon-arrow-down el-icon--right" :class="{ 'rotate-down': userMenuVisible }"></i>
-        </span>
+        <div class="user-section" @click="handleAvatarClick">
+          <img loading="lazy" alt="" src="@/assets/home/avatar.png" class="avatar-img" />
+          <span class="username" v-if="!isMobile">
+            {{ userInfo.username || "Loading..." }}
+            <i class="el-icon-arrow-down" :class="{ 'rotate-down': userMenuVisible }"></i>
+          </span>
+        </div>
         <el-cascader :options="userMenuOptions" trigger="click" :props="cascaderProps"
           style="width: 0px; overflow: hidden" :show-all-levels="false" @change="handleCascaderChange"
           @visible-change="handleUserMenuVisibleChange" ref="userCascader">
@@ -59,7 +63,7 @@
 import userApi from "@/apis/module/user";
 import i18n, { changeLanguage } from "@/i18n";
 import { mapActions, mapGetters } from "vuex";
-import ChangePasswordDialog from "./ChangePasswordDialog.vue"; // 引入修改密码弹窗组件
+import ChangePasswordDialog from "./ChangePasswordDialog.vue";
 
 export default {
   name: "HeaderBar",
@@ -74,6 +78,10 @@ export default {
     isLayoutHeader: {
       type: Boolean,
       default: false
+    },
+    isMobile: {
+      type: Boolean,
+      default: false
     }
   },
   data() {
@@ -83,15 +91,13 @@ export default {
         username: "",
         mobile: "",
       },
-      isChangePasswordDialogVisible: false, // 控制修改密码弹窗的显示
-      userMenuVisible: false, // 添加用户菜单可见状态
+      isChangePasswordDialogVisible: false,
+      userMenuVisible: false,
       isSmallScreen: false,
-      // 搜索历史相关
       searchHistory: [],
       showHistory: false,
       SEARCH_HISTORY_KEY: "xiaozhi_search_history",
       MAX_HISTORY_COUNT: 3,
-      // Cascader 配置
       cascaderProps: {
         expandTrigger: "click",
         value: "value",
@@ -105,11 +111,9 @@ export default {
     isSuperAdmin() {
       return this.getIsSuperAdmin;
     },
-    // 获取当前语言
     currentLanguage() {
       return i18n.locale || "zh_CN";
     },
-    // 获取当前语言显示文本
     currentLanguageText() {
       const currentLang = this.currentLanguage;
       switch (currentLang) {
@@ -127,43 +131,21 @@ export default {
           return this.$t("language.zhCN");
       }
     },
-    // 用户菜单选项
     userMenuOptions() {
       return [
         {
           label: this.currentLanguageText,
           value: "language",
           children: [
-            {
-              label: this.$t("language.zhCN"),
-              value: "zh_CN",
-            },
-            {
-              label: this.$t("language.zhTW"),
-              value: "zh_TW",
-            },
-            {
-              label: this.$t("language.en"),
-              value: "en",
-            },
-            {
-              label: this.$t("language.de"),
-              value: "de",
-            },
-            {
-              label: this.$t("language.vi"),
-              value: "vi",
-            },
+            { label: this.$t("language.zhCN"), value: "zh_CN" },
+            { label: this.$t("language.zhTW"), value: "zh_TW" },
+            { label: this.$t("language.en"), value: "en" },
+            { label: this.$t("language.de"), value: "de" },
+            { label: this.$t("language.vi"), value: "vi" },
           ],
         },
-        {
-          label: this.$t("header.changePassword"),
-          value: "changePassword",
-        },
-        {
-          label: this.$t("header.logout"),
-          value: "logout",
-        },
+        { label: this.$t("header.changePassword"), value: "changePassword" },
+        { label: this.$t("header.logout"), value: "logout" },
       ];
     },
   },
@@ -171,15 +153,12 @@ export default {
     this.fetchUserInfo();
     this.checkScreenSize();
     window.addEventListener("resize", this.checkScreenSize);
-    // 从localStorage加载搜索历史
     this.loadSearchHistory();
   },
-  //移除事件监听器
   beforeDestroy() {
     window.removeEventListener("resize", this.checkScreenSize);
   },
   methods: {
-    // 获取用户信息
     fetchUserInfo() {
       userApi.getUserInfo(({ data }) => {
         this.userInfo = data.data;
@@ -191,42 +170,26 @@ export default {
     checkScreenSize() {
       this.isSmallScreen = window.innerWidth <= 1386;
     },
-    // 处理搜索
     handleSearch() {
       const searchValue = this.search.trim();
-
-      // 如果搜索内容为空，触发重置事件
       if (!searchValue) {
         this.$eventBus.$emit("global-search-reset");
         return;
       }
-
-      // 保存搜索历史
       this.saveSearchHistory(searchValue);
-
-      // 触发搜索事件，将搜索关键词传递给父组件
       this.$eventBus.$emit("global-search", searchValue);
-
-      // 搜索完成后让输入框失去焦点，从而触发blur事件隐藏搜索历史
       if (this.$refs.searchInput) {
         this.$refs.searchInput.blur();
       }
     },
-
-    // 显示搜索历史
     showSearchHistory() {
       this.showHistory = true;
     },
-
-    // 隐藏搜索历史
     hideSearchHistory() {
-      // 延迟隐藏，以便点击事件能够执行
       setTimeout(() => {
         this.showHistory = false;
       }, 200);
     },
-
-    // 加载搜索历史
     loadSearchHistory() {
       try {
         const history = localStorage.getItem(this.SEARCH_HISTORY_KEY);
@@ -234,96 +197,71 @@ export default {
           this.searchHistory = JSON.parse(history);
         }
       } catch (error) {
-        console.error("加载搜索历史失败:", error);
+        console.error("Failed to load search history:", error);
         this.searchHistory = [];
       }
     },
-
-    // 保存搜索历史
     saveSearchHistory(keyword) {
       if (!keyword || this.searchHistory.includes(keyword)) {
         return;
       }
-
-      // 添加到历史记录开头
       this.searchHistory.unshift(keyword);
-
-      // 限制历史记录数量
       if (this.searchHistory.length > this.MAX_HISTORY_COUNT) {
         this.searchHistory = this.searchHistory.slice(0, this.MAX_HISTORY_COUNT);
       }
-
-      // 保存到localStorage
       try {
         localStorage.setItem(this.SEARCH_HISTORY_KEY, JSON.stringify(this.searchHistory));
       } catch (error) {
-        console.error("保存搜索历史失败:", error);
+        console.error("Failed to save search history:", error);
       }
     },
-
-    // 选择搜索历史项
     selectSearchHistory(keyword) {
       this.search = keyword;
       this.handleSearch();
     },
-
-    // 移除单个搜索历史项
     removeSearchHistory(index) {
       this.searchHistory.splice(index, 1);
       try {
         localStorage.setItem(this.SEARCH_HISTORY_KEY, JSON.stringify(this.searchHistory));
       } catch (error) {
-        console.error("更新搜索历史失败:", error);
+        console.error("Failed to update search history:", error);
       }
     },
-
-    // 清空所有搜索历史
     clearSearchHistory() {
       this.searchHistory = [];
       try {
         localStorage.removeItem(this.SEARCH_HISTORY_KEY);
       } catch (error) {
-        console.error("清空搜索历史失败:", error);
+        console.error("Failed to clear search history:", error);
       }
     },
-    // 显示修改密码弹窗
     showChangePasswordDialog() {
       this.isChangePasswordDialogVisible = true;
-      // 添加：显示修改密码弹窗后重置用户菜单可见状态
       this.userMenuVisible = false;
     },
-    // 退出登录
     async handleLogout() {
       try {
-        // 调用 Vuex 的 logout action
         await this.logout();
         this.$message.success({
           message: this.$t("message.success"),
           showClose: true,
         });
       } catch (error) {
-        console.error("退出登录失败:", error);
+        console.error("Logout failed:", error);
         this.$message.error({
           message: this.$t("message.error"),
           showClose: true,
         });
       }
     },
-    
-    // 在data中添加一个key用于强制重新渲染组件
-    // 处理 Cascader 选择变化
     handleCascaderChange(value) {
       if (!value || value.length === 0) {
         return;
       }
-
       const action = value[value.length - 1];
-
-      // 处理语言切换
       if (value.length === 2 && value[0] === "language") {
         this.changeLanguage(action);
       } else {
-        // 处理其他操作
         switch (action) {
           case "changePassword":
             this.showChangePasswordDialog();
@@ -333,35 +271,24 @@ export default {
             break;
         }
       }
-
-      // 操作完成后立即清空选择
       setTimeout(() => {
         this.completeResetCascader();
       }, 300);
     },
-
-    // 切换语言
     changeLanguage(lang) {
       changeLanguage(lang);
       this.$message.success({
         message: this.$t("message.success"),
         showClose: true,
       });
-      // 添加：切换语言后重置用户菜单可见状态
       this.userMenuVisible = false;
     },
-
-    // 完全重置级联选择器
     completeResetCascader() {
       if (this.$refs.userCascader) {
         try {
-          // 尝试所有可能的方法来清空选择
-          // 1. 尝试使用组件提供的clearValue方法
           if (this.$refs.userCascader.clearValue) {
             this.$refs.userCascader.clearValue();
           }
-
-          // 2. 直接清空内部属性
           if (this.$refs.userCascader.$data) {
             this.$refs.userCascader.$data.selectedPaths = [];
             this.$refs.userCascader.$data.displayLabels = [];
@@ -369,81 +296,66 @@ export default {
             this.$refs.userCascader.$data.checkedValue = [];
             this.$refs.userCascader.$data.showAllLevels = false;
           }
-
-          // 3. 操作DOM清除选中状态
           const menuElement = this.$refs.userCascader.$refs.menu;
           if (menuElement && menuElement.$el) {
-            const activeItems = menuElement.$el.querySelectorAll(
-              ".el-cascader-node.is-active"
-            );
+            const activeItems = menuElement.$el.querySelectorAll(".el-cascader-node.is-active");
             activeItems.forEach((item) => item.classList.remove("is-active"));
-
-            const checkedItems = menuElement.$el.querySelectorAll(
-              ".el-cascader-node.is-checked"
-            );
+            const checkedItems = menuElement.$el.querySelectorAll(".el-cascader-node.is-checked");
             checkedItems.forEach((item) => item.classList.remove("is-checked"));
           }
-
-          console.log("Cascader values cleared");
         } catch (error) {
-          console.error("清空选择值失败:", error);
+          console.error("Failed to clear cascader:", error);
         }
       }
     },
-
-    // 点击头像触发cascader下拉菜单
     handleAvatarClick() {
       if (this.$refs.userCascader) {
-        // 切换菜单可见状态
         this.userMenuVisible = !this.userMenuVisible;
-
-        // 菜单收起时清空选择值
         if (!this.userMenuVisible) {
           this.completeResetCascader();
         }
-
-        // 直接设置菜单的显隐状态
         try {
-          // 尝试使用toggleDropDownVisible方法
           this.$refs.userCascader.toggleDropDownVisible(this.userMenuVisible);
         } catch (error) {
-          // 如果toggle方法失败，尝试直接设置属性
           if (this.$refs.userCascader.$refs.menu) {
             this.$refs.userCascader.$refs.menu.showMenu(this.userMenuVisible);
-          } else {
-            console.error("Cannot access menu component");
           }
         }
       }
     },
-
-    // 处理用户菜单可见性变化
     handleUserMenuVisibleChange(visible) {
       this.userMenuVisible = visible;
-
-      // 如果菜单关闭了，也要清空选择值
       if (!visible) {
         this.completeResetCascader();
       }
     },
-
-    // 使用 mapActions 引入 Vuex 的 logout action
     ...mapActions(["logout"]),
   },
 };
 </script>
 
 <style lang="scss" scoped>
+$primary: #07c160;
+$text-primary: #101828;
+$text-secondary: #344054;
+$text-muted: #667085;
+$border-color: #eaecf0;
+$bg-hover: #f9fafb;
+
 .header {
   height: 60px !important;
   background: #fff;
-  border-bottom: 1px solid #f0f0f0;
+  border-bottom: 1px solid $border-color;
   padding: 0 20px;
   
   &.layout-header {
-    padding: 0 20px;
+    padding: 0 24px;
     background: #fff;
-    box-shadow: 0 1px 4px rgba(0,21,41,.08);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  }
+  
+  @media (max-width: 767px) {
+    padding: 0 16px;
   }
 }
 
@@ -452,6 +364,28 @@ export default {
   justify-content: space-between;
   align-items: center;
   height: 100%;
+  gap: 16px;
+}
+
+.hamburger-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 8px;
+  cursor: pointer;
+  color: $text-secondary;
+  transition: all 0.2s ease;
+  
+  &:hover {
+    background: $bg-hover;
+    color: $primary;
+  }
+  
+  i {
+    font-size: 20px;
+  }
 }
 
 .header-center {
@@ -461,55 +395,102 @@ export default {
 .header-right {
   display: flex;
   align-items: center;
-  gap: 15px;
+  gap: 16px;
   justify-content: flex-end;
 }
 
 .search-container {
-  margin-right: 15px;
-  width: 200px;
+  width: 240px;
+  
+  @media (max-width: 1024px) {
+    width: 180px;
+  }
+  
+  @media (max-width: 767px) {
+    display: none;
+  }
 }
 
 .search-wrapper {
   position: relative;
 }
 
+::v-deep .custom-search-input {
+  .el-input__inner {
+    border-radius: 10px;
+    border-color: $border-color;
+    height: 40px;
+    background: #f9fafb;
+    transition: all 0.2s ease;
+    
+    &:focus {
+      border-color: $primary;
+      background: #fff;
+      box-shadow: 0 0 0 3px rgba(7, 193, 96, 0.1);
+    }
+  }
+  
+  .el-input__suffix {
+    display: flex;
+    align-items: center;
+    height: 100%;
+    top: 0;
+  }
+  
+  .el-input__suffix-inner {
+    display: flex;
+    align-items: center;
+  }
+}
+
+.search-icon {
+  cursor: pointer;
+  font-size: 16px;
+  color: $text-muted;
+  margin-right: 8px;
+  transition: color 0.2s;
+  
+  &:hover {
+    color: $primary;
+  }
+}
+
 .search-history-dropdown {
   position: absolute;
-  top: 100%;
+  top: calc(100% + 4px);
   left: 0;
   right: 0;
   background: white;
-  border: 1px solid #e4e6ef;
-  border-radius: 4px;
-  box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
+  border: 1px solid $border-color;
+  border-radius: 10px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
   z-index: 1000;
-  margin-top: 2px;
+  overflow: hidden;
 }
 
 .search-history-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 8px 12px;
-  border-bottom: 1px solid #f0f0f0;
+  padding: 10px 14px;
+  border-bottom: 1px solid $border-color;
   font-size: 12px;
-  color: #909399;
+  color: $text-muted;
 }
 
 .clear-history-btn {
-  color: #909399;
+  color: $text-muted;
   font-size: 11px;
   padding: 0;
   height: auto;
-}
-
-.clear-history-btn:hover {
-  color: #606266;
+  
+  &:hover {
+    color: $primary;
+  }
 }
 
 .search-history-list {
-  max-height: 200px;
+  max-height: 160px;
   overflow-y: auto;
 }
 
@@ -517,54 +498,68 @@ export default {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 8px 12px;
+  padding: 10px 14px;
   cursor: pointer;
-  font-size: 12px;
-  color: #606266;
-}
-
-.search-history-item:hover {
-  background-color: #f5f7fa;
+  font-size: 13px;
+  color: $text-secondary;
+  transition: background 0.15s;
+  
+  &:hover {
+    background: $bg-hover;
+    
+    .clear-item-icon {
+      visibility: visible;
+    }
+  }
 }
 
 .clear-item-icon {
-  font-size: 10px;
-  color: #909399;
+  font-size: 12px;
+  color: $text-muted;
   visibility: hidden;
+  
+  &:hover {
+    color: #ef4444;
+  }
+}
+
+.user-section {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  padding: 6px 10px;
+  border-radius: 10px;
+  transition: background 0.2s;
+  
+  &:hover {
+    background: $bg-hover;
+  }
 }
 
 .avatar-img {
-  width: 32px;
-  height: 32px;
-  cursor: pointer;
+  width: 36px;
+  height: 36px;
   border-radius: 50%;
+  object-fit: cover;
 }
 
-.el-user-dropdown {
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  gap: 5px;
+.username {
   font-size: 14px;
-  color: #333;
-}
-
-/* Fix search icon alignment */
-::v-deep .custom-search-input .el-input__suffix {
+  font-weight: 500;
+  color: $text-primary;
   display: flex;
   align-items: center;
-  height: 100%;
-  top: 0;
-}
-
-::v-deep .custom-search-input .el-input__suffix-inner {
-  display: flex;
-  align-items: center;
-}
-
-.search-icon {
-  cursor: pointer;
-  font-size: 16px;
-  margin-right: 5px;
+  gap: 4px;
+  
+  i {
+    font-size: 12px;
+    color: $text-muted;
+    transition: transform 0.2s;
+    
+    &.rotate-down {
+      transform: rotate(180deg);
+    }
+  }
 }
 </style>

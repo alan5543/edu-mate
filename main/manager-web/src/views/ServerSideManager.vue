@@ -171,7 +171,7 @@ export default {
 
 <style lang="scss" scoped>
 .welcome {
-  min-width: 900px;
+  width: 100%;
   min-height: 506px;
   height: 100%;
   display: flex;
@@ -195,6 +195,11 @@ export default {
   background: rgba(237, 242, 255, 0.5);
   display: flex;
   flex-direction: column;
+
+  @media (max-width: 768px) {
+    margin: 5px 10px;
+    max-height: calc(100vh - 100px);
+  }
 }
 
 .operation-bar {
@@ -202,11 +207,19 @@ export default {
   justify-content: space-between;
   align-items: center;
   padding: 16px 24px;
+
+  @media (max-width: 768px) {
+    padding: 12px 16px;
+  }
 }
 
 .page-title {
   font-size: 24px;
   margin: 0;
+
+  @media (max-width: 768px) {
+    font-size: 20px;
+  }
 }
 
 .right-operations {
@@ -238,8 +251,8 @@ export default {
 .content-area {
   flex: 1;
   height: 100%;
-  min-width: 600px;
-  overflow: auto;
+  width: 100%;
+  overflow: hidden;
   background-color: white;
   display: flex;
   flex-direction: column;
@@ -260,6 +273,10 @@ export default {
     flex-direction: column;
     flex: 1;
     overflow: hidden;
+
+    @media (max-width: 768px) {
+      padding: 10px;
+    }
   }
 }
 
@@ -450,6 +467,8 @@ export default {
 .el-table {
   --table-max-height: calc(100vh - 40vh);
   max-height: var(--table-max-height);
+  flex: 1;
+  overflow: hidden;
 
   .el-table__body-wrapper {
     max-height: calc(var(--table-max-height) - 40px);

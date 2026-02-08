@@ -364,7 +364,7 @@ export default {
 
 <style lang="scss" scoped>
 .welcome {
-    min-width: 900px;
+    width: 100%; // Changed from min-width: 900px
     min-height: 506px;
     height: 100%;
     display: flex;
@@ -388,6 +388,11 @@ export default {
     background: rgba(240, 249, 240, 0.5);
     display: flex;
     flex-direction: column;
+
+    @media (max-width: 768px) {
+        margin: 5px 10px;
+        max-height: calc(100vh - 100px); // Adjust height for mobile
+    }
 }
 
 .operation-bar {
@@ -395,17 +400,39 @@ export default {
     justify-content: space-between;
     align-items: center;
     padding: 16px 24px;
+
+    @media (max-width: 768px) {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+        padding: 12px 16px;
+    }
 }
 
 .page-title {
     font-size: 24px;
     margin: 0;
+
+    @media (max-width: 768px) {
+        font-size: 20px;
+        margin-bottom: 8px;
+    }
 }
 
 .right-operations {
     display: flex;
     gap: 10px;
     margin-left: auto;
+
+    @media (max-width: 768px) {
+        margin-left: 0;
+        width: 100%;
+        
+        .search-input {
+            flex: 1;
+            width: auto; // Override fixed width
+        }
+    }
 }
 
 .search-input {
@@ -431,8 +458,8 @@ export default {
 .content-area {
     flex: 1;
     height: 100%;
-    min-width: 600px;
-    overflow: auto;
+    width: 100%; // Changed from min-width: 600px
+    overflow: hidden; // Changed to hidden to let table handle scroll
     background-color: white;
     display: flex;
     flex-direction: column;
@@ -453,6 +480,10 @@ export default {
         flex-direction: column;
         flex: 1;
         overflow: hidden;
+
+        @media (max-width: 768px) {
+            padding: 10px;
+        }
     }
 }
 
@@ -462,12 +493,26 @@ export default {
     align-items: center;
     margin-top: 10px;
     padding-bottom: 10px;
+    width: 100%;
+
+    @media (max-width: 768px) {
+        flex-direction: column;
+        gap: 10px;
+        align-items: flex-start;
+    }
 }
 
 .ctrl_btn {
     display: flex;
     gap: 8px;
     padding-left: 26px;
+
+    @media (max-width: 768px) {
+        padding-left: 0;
+        width: 100%;
+        overflow-x: auto;
+        padding-bottom: 5px; // For scrollbar if needed
+    }
 
     .el-button {
         min-width: 72px;
@@ -503,6 +548,23 @@ export default {
     align-items: center;
     gap: 10px;
 
+    @media (max-width: 768px) {
+        width: 100%;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 5px;
+        
+        .page-size-select {
+            width: 80px;
+        }
+        
+        .total-text {
+            width: 100%;
+            text-align: center;
+            margin-top: 5px;
+        }
+    }
+
     .el-select {
         margin-right: 8px;
     }
@@ -521,6 +583,12 @@ export default {
         font-size: 14px;
         cursor: pointer;
         transition: all 0.3s ease;
+
+        @media (max-width: 768px) {
+            min-width: 40px;
+            padding: 0 8px;
+            font-size: 12px;
+        }
 
         &:hover {
             background: #d7dce6;
@@ -711,9 +779,12 @@ export default {
 .el-table {
     --table-max-height: calc(100vh - 40vh);
     max-height: var(--table-max-height);
+    flex: 1;
+    overflow: hidden;
 
     .el-table__body-wrapper {
         max-height: calc(var(--table-max-height) - 40px);
+        overflow-y: auto;
     }
 }
 

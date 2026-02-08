@@ -1,118 +1,125 @@
 <template>
-  <div class="sidebar-container" :class="{ 'collapsed': isCollapsed }">
-    <div class="logo-container" @click="goHome">
-      <img loading="lazy" alt="Logo" src="@/assets/xiaozhi-logo.png" class="logo-img" />
-      <img v-if="!isCollapsed" loading="lazy" alt="Brand" :src="xiaozhiAiIcon" class="brand-img" />
-    </div>
+  <div>
+    <!-- Mobile overlay -->
+    <transition name="fade">
+      <div 
+        v-if="isMobileMenuOpen && isMobile" 
+        class="mobile-overlay" 
+        @click="closeMobileMenu"
+      ></div>
+    </transition>
 
-    <el-scrollbar wrap-class="scrollbar-wrapper">
-      <el-menu
-        :default-active="activeMenu"
-        :collapse="isCollapsed"
-        :background-color="variables.menuBg"
-        :text-color="variables.menuText"
-        :active-text-color="variables.menuActiveText"
-        :unique-opened="false"
-        :collapse-transition="false"
-        mode="vertical"
-        class="sidebar-menu"
-      >
-        <!-- 智能体管理 (Smart Management) -->
-        <el-menu-item index="/home" @click="goHome">
-          <i class="el-icon-s-home"></i>
-          <span slot="title">{{ $t("header.smartManagement") }}</span>
-        </el-menu-item>
+    <div 
+      class="sidebar-container" 
+      :class="{ 
+        'collapsed': isCollapsed && !isMobile, 
+        'mobile-open': isMobileMenuOpen && isMobile,
+        'is-mobile': isMobile 
+      }"
+    >
+      <div class="logo-container" @click="goHome">
+        <img loading="lazy" alt="Logo" src="@/assets/xiaozhi-logo.png" class="logo-img" />
+        <img v-if="!isCollapsed || isMobile" loading="lazy" alt="Brand" :src="xiaozhiAiIcon" class="brand-img" />
+      </div>
 
-        <!-- 音色克隆管理 (Voice Clone Management) -->
-        <!-- 普通用户显示单个菜单 -->
-        <el-menu-item 
-          v-if="!isSuperAdmin && featureStatus.voiceClone" 
-          index="/voice-clone-management" 
-          @click="goVoiceCloneManagement"
+      <el-scrollbar wrap-class="scrollbar-wrapper">
+        <el-menu
+          :default-active="activeMenu"
+          :collapse="isCollapsed && !isMobile"
+          :background-color="'transparent'"
+          :text-color="'#344054'"
+          :active-text-color="'#07c160'"
+          :unique-opened="false"
+          :collapse-transition="false"
+          mode="vertical"
+          class="sidebar-menu"
         >
-          <i class="el-icon-microphone"></i>
-          <span slot="title">{{ $t("header.voiceCloneManagement") }}</span>
-        </el-menu-item>
+          <!-- 智能体管理 (Smart Management) -->
+          <el-menu-item index="/home" @click="handleMenuClick('/home')">
+            <i class="el-icon-s-home"></i>
+            <span slot="title">{{ $t("header.smartManagement") }}</span>
+          </el-menu-item>
 
-        <!-- 超级管理员显示子菜单 -->
-        <el-submenu v-if="isSuperAdmin && featureStatus.voiceClone" index="voice-clone">
-          <template slot="title">
+          <!-- 音色克隆管理 (Voice Clone Management) -->
+          <el-menu-item 
+            v-if="!isSuperAdmin && featureStatus.voiceClone" 
+            index="/voice-clone-management" 
+            @click="handleMenuClick('/voice-clone-management')"
+          >
             <i class="el-icon-microphone"></i>
             <span slot="title">{{ $t("header.voiceCloneManagement") }}</span>
-          </template>
-          <el-menu-item index="/voice-clone-management" @click="goVoiceCloneManagement">
-            <i class="el-icon-microphone"></i>
-            <span slot="title">{{ $t("header.voiceCloneManagement") }}</span>
           </el-menu-item>
-          <el-menu-item index="/voice-resource-management" @click="goVoiceResourceManagement">
-            <i class="el-icon-headset"></i>
-            <span slot="title">{{ $t("header.voiceResourceManagement") }}</span>
-          </el-menu-item>
-        </el-submenu>
 
-        <!-- 模型配置 (Model Config) - Super Admin Only -->
-        <el-menu-item v-if="isSuperAdmin" index="/model-config" @click="goModelConfig">
-          <i class="el-icon-setting"></i>
-          <span slot="title">{{ $t("header.modelConfig") }}</span>
-        </el-menu-item>
+          <!-- 超级管理员显示子菜单 -->
+          <el-submenu v-if="isSuperAdmin && featureStatus.voiceClone" index="voice-clone">
+            <template slot="title">
+              <i class="el-icon-microphone"></i>
+              <span>{{ $t("header.voiceCloneManagement") }}</span>
+            </template>
+            <el-menu-item index="/voice-clone-management" @click="handleMenuClick('/voice-clone-management')">
+              <span>{{ $t("header.voiceCloneManagement") }}</span>
+            </el-menu-item>
+            <el-menu-item index="/voice-resource-management" @click="handleMenuClick('/voice-resource-management')">
+              <span>{{ $t("header.voiceResourceManagement") }}</span>
+            </el-menu-item>
+          </el-submenu>
 
-        <!-- 知识库管理 (Knowledge Base) -->
-        <el-menu-item 
-          v-if="featureStatus.knowledgeBase" 
-          index="/knowledge-base-management" 
-          @click="goKnowledgeBaseManagement"
-        >
-          <i class="el-icon-document"></i>
-          <span slot="title">{{ $t("header.knowledgeBase") }}</span>
-        </el-menu-item>
+          <!-- 模型配置 (Model Config) - Super Admin Only -->
+          <el-menu-item v-if="isSuperAdmin" index="/model-config" @click="handleMenuClick('/model-config')">
+            <i class="el-icon-setting"></i>
+            <span slot="title">{{ $t("header.modelConfig") }}</span>
+          </el-menu-item>
 
-        <!-- 参数字典 (Param Dictionary) - Super Admin Only -->
-        <el-submenu v-if="isSuperAdmin" index="param-dictionary">
-          <template slot="title">
-            <i class="el-icon-menu"></i>
-            <span slot="title">{{ $t("header.paramDictionary") }}</span>
-          </template>
-          
-          <el-menu-item index="/params-management" @click="goParamManagement">
-            <i class="el-icon-s-operation"></i>
-            <span slot="title">{{ $t("header.paramManagement") }}</span>
+          <!-- 知识库管理 (Knowledge Base) -->
+          <el-menu-item 
+            v-if="featureStatus.knowledgeBase" 
+            index="/knowledge-base-management" 
+            @click="handleMenuClick('/knowledge-base-management')"
+          >
+            <i class="el-icon-document"></i>
+            <span slot="title">{{ $t("header.knowledgeBase") }}</span>
           </el-menu-item>
-          <el-menu-item index="/user-management" @click="goUserManagement">
-            <i class="el-icon-user"></i>
-            <span slot="title">{{ $t("header.userManagement") }}</span>
-          </el-menu-item>
-          <el-menu-item index="/ota-management" @click="goOtaManagement">
-            <i class="el-icon-upload"></i>
-            <span slot="title">{{ $t("header.otaManagement") }}</span>
-          </el-menu-item>
-          <el-menu-item index="/dict-management" @click="goDictManagement">
-            <i class="el-icon-notebook-2"></i>
-            <span slot="title">{{ $t("header.dictManagement") }}</span>
-          </el-menu-item>
-          <el-menu-item index="/provider-management" @click="goProviderManagement">
-            <i class="el-icon-connection"></i>
-            <span slot="title">{{ $t("header.providerManagement") }}</span>
-          </el-menu-item>
-          <el-menu-item index="/agent-template-management" @click="goAgentTemplateManagement">
-            <i class="el-icon-s-custom"></i>
-            <span slot="title">{{ $t("header.agentTemplate") }}</span>
-          </el-menu-item>
-          <el-menu-item index="/server-side-management" @click="goServerSideManagement">
-            <i class="el-icon-s-platform"></i>
-            <span slot="title">{{ $t("header.serverSideManagement") }}</span>
-          </el-menu-item>
-          <el-menu-item index="/feature-management" @click="goFeatureManagement">
-            <i class="el-icon-s-grid"></i>
-            <span slot="title">{{ $t("header.featureManagement") }}</span>
-          </el-menu-item>
-        </el-submenu>
 
-      </el-menu>
-    </el-scrollbar>
+          <!-- 参数字典 (Param Dictionary) - Super Admin Only -->
+          <el-submenu v-if="isSuperAdmin" index="param-dictionary">
+            <template slot="title">
+              <i class="el-icon-menu"></i>
+              <span>{{ $t("header.paramDictionary") }}</span>
+            </template>
+            
+            <el-menu-item index="/params-management" @click="handleMenuClick('/params-management')">
+              <span>{{ $t("header.paramManagement") }}</span>
+            </el-menu-item>
+            <el-menu-item index="/user-management" @click="handleMenuClick('/user-management')">
+              <span>{{ $t("header.userManagement") }}</span>
+            </el-menu-item>
+            <el-menu-item index="/ota-management" @click="handleMenuClick('/ota-management')">
+              <span>{{ $t("header.otaManagement") }}</span>
+            </el-menu-item>
+            <el-menu-item index="/dict-management" @click="handleMenuClick('/dict-management')">
+              <span>{{ $t("header.dictManagement") }}</span>
+            </el-menu-item>
+            <el-menu-item index="/provider-management" @click="handleMenuClick('/provider-management')">
+              <span>{{ $t("header.providerManagement") }}</span>
+            </el-menu-item>
+            <el-menu-item index="/agent-template-management" @click="handleMenuClick('/agent-template-management')">
+              <span>{{ $t("header.agentTemplate") }}</span>
+            </el-menu-item>
+            <el-menu-item index="/server-side-management" @click="handleMenuClick('/server-side-management')">
+              <span>{{ $t("header.serverSideManagement") }}</span>
+            </el-menu-item>
+            <el-menu-item index="/feature-management" @click="handleMenuClick('/feature-management')">
+              <span>{{ $t("header.featureManagement") }}</span>
+            </el-menu-item>
+          </el-submenu>
 
-    <!-- 折叠按钮 -->
-    <div class="collapse-btn" @click="toggleCollapse">
-      <i :class="isCollapsed ? 'el-icon-s-unfold' : 'el-icon-s-fold'"></i>
+        </el-menu>
+      </el-scrollbar>
+
+      <!-- 折叠按钮 (Desktop only) -->
+      <div v-if="!isMobile" class="collapse-btn" @click="toggleCollapse">
+        <i :class="isCollapsed ? 'el-icon-s-unfold' : 'el-icon-s-fold'"></i>
+      </div>
     </div>
   </div>
 </template>
@@ -127,6 +134,8 @@ export default {
   data() {
     return {
       isCollapsed: false,
+      isMobileMenuOpen: false,
+      isMobile: false,
       featureStatus: {
         voiceClone: false,
         knowledgeBase: false,
@@ -141,18 +150,10 @@ export default {
     activeMenu() {
       const route = this.$route;
       const { meta, path } = route;
-      // if set path, the sidebar will highlight the path you set
       if (meta.activeMenu) {
         return meta.activeMenu;
       }
       return path;
-    },
-    variables() {
-      return {
-        menuBg: "#ffffff",
-        menuText: "#3d4566",
-        menuActiveText: "#07c160",
-      };
     },
     currentLanguage() {
       return i18n.locale || "zh_CN";
@@ -170,11 +171,38 @@ export default {
   },
   async mounted() {
     await this.loadFeatureStatus();
+    this.checkMobile();
+    window.addEventListener("resize", this.checkMobile);
+  },
+  beforeDestroy() {
+    window.removeEventListener("resize", this.checkMobile);
   },
   methods: {
+    checkMobile() {
+      this.isMobile = window.innerWidth < 768;
+      if (!this.isMobile) {
+        this.isMobileMenuOpen = false;
+      }
+    },
     toggleCollapse() {
       this.isCollapsed = !this.isCollapsed;
       this.$emit('toggle-collapse', this.isCollapsed);
+    },
+    toggleMobileMenu() {
+      this.isMobileMenuOpen = !this.isMobileMenuOpen;
+      this.$emit('mobile-menu-toggle', this.isMobileMenuOpen);
+    },
+    closeMobileMenu() {
+      this.isMobileMenuOpen = false;
+      this.$emit('mobile-menu-toggle', false);
+    },
+    handleMenuClick(path) {
+      if (this.$route.path !== path) {
+        this.$router.push(path);
+      }
+      if (this.isMobile) {
+        this.closeMobileMenu();
+      }
     },
     async loadFeatureStatus() {
       await featureManager.waitForInitialization();
@@ -183,107 +211,125 @@ export default {
       this.featureStatus.knowledgeBase = config.knowledgeBase;
     },
     goHome() {
-      if (this.$route.path !== '/home') this.$router.push("/home");
-    },
-    goVoiceCloneManagement() {
-      if (this.$route.path !== '/voice-clone-management') this.$router.push("/voice-clone-management");
-    },
-    goVoiceResourceManagement() {
-      if (this.$route.path !== '/voice-resource-management') this.$router.push("/voice-resource-management");
-    },
-    goModelConfig() {
-      if (this.$route.path !== '/model-config') this.$router.push("/model-config");
-    },
-    goKnowledgeBaseManagement() {
-      if (this.$route.path !== '/knowledge-base-management') this.$router.push("/knowledge-base-management");
-    },
-    goParamManagement() {
-      if (this.$route.path !== '/params-management') this.$router.push("/params-management");
-    },
-    goUserManagement() {
-      if (this.$route.path !== '/user-management') this.$router.push("/user-management");
-    },
-    goOtaManagement() {
-      if (this.$route.path !== '/ota-management') this.$router.push("/ota-management");
-    },
-    goDictManagement() {
-      if (this.$route.path !== '/dict-management') this.$router.push("/dict-management");
-    },
-    goProviderManagement() {
-      if (this.$route.path !== '/provider-management') this.$router.push("/provider-management");
-    },
-    goAgentTemplateManagement() {
-      if (this.$route.path !== '/agent-template-management') this.$router.push("/agent-template-management");
-    },
-    goServerSideManagement() {
-      if (this.$route.path !== '/server-side-management') this.$router.push("/server-side-management");
-    },
-    goFeatureManagement() {
-      if (this.$route.path !== '/feature-management') this.$router.push("/feature-management");
+      this.handleMenuClick('/home');
     },
   },
 };
 </script>
 
 <style lang="scss" scoped>
-.sidebar-container {
-  transition: width 0.28s;
-  width: 240px;
-  background-color: #ffffff;
-  height: 100vh;
+$primary: #07c160;
+$primary-hover: #06ad56;
+$primary-light: rgba(7, 193, 96, 0.1);
+
+$text-primary: #101828;
+$text-secondary: #344054;
+$text-muted: #98a2b3;
+
+$border-color: #eaecf0;
+$bg-hover: #f9fafb;
+
+$sidebar-width: 240px;
+$sidebar-collapsed: 72px;
+
+$transition: 0.25s ease;
+
+.mobile-overlay {
   position: fixed;
-  font-size: 0px;
   top: 0;
+  left: 0;
+  right: 0;
   bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 1000;
+  backdrop-filter: blur(4px);
+}
+
+.sidebar-container {
+  width: $sidebar-width;
+  height: 100vh;
+  background: #fff;
+  position: fixed;
+  top: 0;
   left: 0;
   z-index: 1001;
-  overflow: hidden;
-  box-shadow: 2px 0 8px rgba(0, 0, 0, 0.05); /* Enhanced shadow */
   display: flex;
   flex-direction: column;
+  transition: all $transition;
+  border-right: 1px solid $border-color;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.03);
 
   &.collapsed {
-    width: 75px;
-    
+    width: $sidebar-collapsed;
+
     .logo-container {
-      padding: 0;
+      padding: 0 12px;
       justify-content: center;
       
-      .logo-img {
-        margin-right: 0; /* Center logo when collapsed */
-      }
-
       .brand-img {
         display: none;
       }
     }
+    
+    .sidebar-menu {
+      ::v-deep .el-menu-item,
+      ::v-deep .el-submenu .el-submenu__title {
+        padding: 0 !important;
+        padding-left: 0 !important;
+        padding-right: 0 !important;
+        justify-content: center;
+        
+        span {
+          display: none;
+        }
+        
+        i {
+          margin: 0;
+        }
+
+        .el-submenu__icon-arrow {
+          display: none !important;
+        }
+      }
+    }
+  }
+
+  &.is-mobile {
+    transform: translateX(-100%);
+    box-shadow: none;
+    width: 280px;
+    
+    &.mobile-open {
+      transform: translateX(0);
+      box-shadow: 0 0 40px rgba(0, 0, 0, 0.12);
+    }
   }
 
   .logo-container {
-    height: 80px;
+    height: 64px;
     display: flex;
     align-items: center;
-    padding: 0 20px;
+    padding: 0 16px;
     cursor: pointer;
-    /* border-bottom: 1px solid #f0f0f0; Removed for cleaner look */
+    flex-shrink: 0;
+    border-bottom: 1px solid $border-color;
+    gap: 8px;
     
     .logo-img {
-      width: 40px; /* Adjusted to 40px for better balance with 240px width */
-      height: 40px;
-      margin-right: 12px;
+      width: 36px;
+      height: 36px;
       flex-shrink: 0;
     }
     
     .brand-img {
-      height: 80px; /* Increased to 80px as requested */
+      height: 56px;
       object-fit: contain;
-      transition: opacity 0.3s;
     }
   }
 
   .el-scrollbar {
     flex: 1;
-    height: 100%;
+    overflow: hidden;
     
     ::v-deep .el-scrollbar__wrap {
       overflow-x: hidden;
@@ -292,84 +338,145 @@ export default {
 
   .sidebar-menu {
     border: none;
-    height: 100%;
-    width: 100% !important;
+    background: transparent !important;
+    padding: 8px;
     
     &:not(.el-menu--collapse) {
-      width: 240px; /* Updated width */
+      width: 100%;
     }
 
-    /* Enhance menu item styling */
     ::v-deep .el-menu-item,
     ::v-deep .el-submenu__title {
-      height: 50px;
-      line-height: 50px;
-      margin: 4px 12px; /* Margin for pill shape */
-      border-radius: 8px; /* Rounded corners */
-      transition: all 0.3s ease;
+      height: 44px;
+      line-height: 44px;
+      margin: 2px 0;
+      padding: 0 12px !important;
+      border-radius: 8px;
+      color: $text-secondary;
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
       
       i {
         font-size: 18px;
         margin-right: 10px;
-        color: #909399;
-        transition: color 0.3s;
+        color: $text-muted;
+        transition: color 0.2s;
+        width: 20px;
+        text-align: center;
+        flex-shrink: 0;
       }
       
       span {
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
-        display: inline-block;
-        vertical-align: middle;
-        max-width: 160px; /* Adjusted max-width */
         font-size: 14px;
-      }
-      
-      &.is-active {
-        background-color: rgba(7, 193, 96, 0.1) !important; /* Subtle green bg */
-        color: #07c160 !important;
-        font-weight: 600;
-        
-        i {
-          color: #07c160;
-        }
+        font-weight: 500;
       }
       
       &:hover {
-        background-color: #f5f7fa !important;
-        color: #303133 !important;
+        background: $bg-hover;
+        color: $text-primary;
         
         i {
-          color: #303133;
+          color: $text-secondary;
+        }
+      }
+      
+      &.is-active {
+        background: $primary-light;
+        color: $primary;
+        font-weight: 600;
+        
+        i {
+          color: $primary;
         }
       }
     }
     
-    /* Ensure active item hover state keeps green color */
     ::v-deep .el-menu-item.is-active:hover {
-        background-color: rgba(7, 193, 96, 0.15) !important;
-        color: #07c160 !important;
+      background: rgba(7, 193, 96, 0.15);
+      color: $primary;
+      
+      i {
+        color: $primary;
+      }
+    }
+
+    ::v-deep .el-submenu {
+      .el-submenu__title {
+        padding-right: 24px !important;
         
-        i {
-          color: #07c160;
+        .el-submenu__icon-arrow {
+          right: 8px;
         }
+      }
+      
+      .el-menu {
+        background: transparent !important;
+        
+        .el-menu-item {
+          padding-left: 44px !important;
+          height: 40px;
+          line-height: 40px;
+          font-size: 13px;
+        }
+      }
     }
   }
 
   .collapse-btn {
-    height: 50px;
+    height: 48px;
     display: flex;
     align-items: center;
     justify-content: center;
     cursor: pointer;
-    /* border-top: 1px solid #f0f0f0; Removed */
-    color: #909399;
-    font-size: 20px;
-    transition: all 0.3s;
+    color: $text-muted;
+    font-size: 18px;
+    transition: all 0.2s ease;
+    border-top: 1px solid $border-color;
+    flex-shrink: 0;
     
     &:hover {
-      background-color: #f9f9f9;
-      color: #07c160;
+      background: $bg-hover;
+      color: $primary;
+    }
+  }
+}
+
+// Transitions
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.2s ease;
+}
+
+.fade-enter,
+.fade-leave-to {
+  opacity: 0;
+}
+</style>
+
+<style lang="scss">
+/* Global styles for Element UI popup menus */
+.el-menu--popup {
+  background-color: #ffffff !important;
+  box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
+  padding: 5px 0;
+  border-radius: 4px;
+
+  .el-menu-item {
+    background-color: #ffffff !important;
+    color: #344054 !important;
+
+    &:hover {
+      background-color: #f9fafb !important;
+      color: #101828 !important;
+    }
+
+    &.is-active {
+      color: #07c160 !important;
+      background-color: rgba(7, 193, 96, 0.1) !important;
     }
   }
 }

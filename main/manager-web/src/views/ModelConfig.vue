@@ -626,28 +626,27 @@ export default {
   background: transparent;
 }
 
+
 .welcome {
-  min-width: 900px;
-  min-height: 506px;
   height: 100%;
   display: flex;
   position: relative;
   flex-direction: column;
   background-size: cover;
   background: linear-gradient(135deg, #f0f9f0 0%, #e6f7e9 100%) center;
-  -webkit-background-size: cover;
-  -o-background-size: cover;
+  overflow-x: hidden;
 }
 
 .main-wrapper {
   margin: 5px 22px;
   border-radius: 15px;
-  min-height: calc(100vh - 26vh);
+  min-height: calc(100vh - 24vh);
   height: auto;
-  max-height: 80vh;
   box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
   position: relative;
   background: rgba(240, 249, 240, 0.5);
+  display: flex;
+  flex-direction: column;
 }
 
 .operation-bar {
@@ -655,6 +654,8 @@ export default {
   justify-content: space-between;
   align-items: center;
   padding: 16px 24px;
+  flex-wrap: wrap;
+  gap: 16px;
 }
 
 .page-title {
@@ -670,10 +671,11 @@ export default {
   border-radius: 15px;
   background: transparent;
   border: 1px solid #fff;
+  flex-direction: row;
 }
 
 .nav-panel {
-  min-width: 242px;
+  width: 200px;
   height: 100%;
   border-right: 1px solid #e1f3d8;
   background: linear-gradient(
@@ -681,8 +683,7 @@ export default {
       rgba(7, 193, 96, 0.1) 0%,
       rgba(6, 173, 86, 0.1) 25%,
       transparent 60%
-    ),
-    url("../assets/model/model.png") no-repeat center / cover;
+    );
   padding: 16px 0;
   flex-shrink: 0;
   display: flex;
@@ -691,16 +692,19 @@ export default {
 
 .nav-panel .el-menu-item {
   height: 50px;
-  background: #f0f9f0;
+  background: transparent;
   line-height: 50px;
   border-radius: 4px 0 0 4px !important;
   transition: all 0.3s;
   display: flex !important;
   justify-content: flex-end;
   padding-right: 12px !important;
-  width: fit-content;
-  margin: 8px 0 8px auto;
-  min-width: unset;
+  width: 100%;
+  margin: 4px 0;
+}
+
+.nav-panel .el-menu-item:hover {
+  background-color: rgba(7, 193, 96, 0.05);
 }
 
 .nav-panel .el-menu-item.is-active {
@@ -730,30 +734,37 @@ export default {
   padding-right: 8px;
 }
 
+.nav-panel .el-menu-item.is-active .menu-text {
+  color: #fff;
+}
+
 .content-area {
   flex: 1;
   padding: 24px;
   height: 100%;
-  min-width: 600px;
   overflow: hidden;
   background-color: white;
   display: flex;
   flex-direction: column;
+  min-width: 0; /* Important for flex child to shrink */
 }
 
 .action-group {
   display: flex;
   align-items: center;
   gap: 16px;
+  flex-wrap: wrap;
 }
 
 .search-group {
   display: flex;
   gap: 10px;
+  flex-wrap: wrap;
 }
 
 .search-input {
   width: 240px;
+  max-width: 100%;
 }
 
 .btn-search {
@@ -798,6 +809,75 @@ export default {
   align-items: center;
   top: 6px;
   border-radius: 4px;
+}
+
+@media screen and (max-width: 768px) {
+  .main-wrapper {
+    margin: 10px;
+    height: auto;
+    min-height: calc(100vh - 100px);
+  }
+
+  .content-panel {
+    flex-direction: column;
+    height: auto;
+    overflow: visible;
+  }
+
+  .nav-panel {
+    width: 100%;
+    height: auto;
+    border-right: none;
+    border-bottom: 1px solid #e1f3d8;
+    padding: 8px;
+    flex-direction: row;
+    overflow-x: auto;
+    background: white;
+  }
+
+  .nav-panel .el-menu-item {
+    width: auto;
+    margin: 0 4px;
+    border-radius: 4px !important;
+    justify-content: center;
+    padding: 0 16px !important;
+  }
+
+  .nav-panel .el-menu-item.is-active {
+    padding-left: 16px !important;
+  }
+
+  .nav-panel .el-menu-item.is-active::before {
+    display: none;
+  }
+
+  .menu-text {
+    text-align: center;
+    padding-right: 0;
+  }
+
+  .content-area {
+    padding: 16px;
+    overflow: visible;
+    height: auto;
+  }
+  
+  .operation-bar {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  
+  .action-group {
+    width: 100%;
+  }
+  
+  .search-group {
+    width: 100%;
+  }
+
+  .search-input {
+    flex: 1;
+  }
 }
 
 ::v-deep .page-size-select .el-input__suffix-inner {

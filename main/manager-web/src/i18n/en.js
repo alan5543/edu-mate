@@ -419,6 +419,7 @@ export default {
 
   // Device management page text
   'device.management': 'Device Management',
+  'device.statusDesc': 'Manage and monitor your connected devices',
   'device.add': 'Add Device',
   'device.edit': 'Edit Device',
   'device.delete': 'Delete Device',
@@ -468,6 +469,9 @@ export default {
   'device.deviceStatus': 'Status',
   'device.online': 'Online',
   'device.offline': 'Offline',
+  'device.status': 'Status',
+  'device.onlineStatus': 'Online',
+  'device.offlineStatus': 'Offline',
 
   // Message tips
   'message.success': 'Operation Successful',
@@ -656,6 +660,7 @@ export default {
   'common.cancel': 'Cancel',
   'common.sensitive': 'Sensitive',
   'common.loading': 'Loading',
+  'common.noData': 'No data',
 
   // Language switch
   'language.zhCN': '中文简体',
@@ -683,6 +688,17 @@ export default {
   'home.deleteSuccess': 'Delete successful',
   'home.deleteFailed': 'Delete failed',
   'home.enableMemory': 'Please enable memory in the "Config Role" page first',
+  'home.goodMorning': 'Good morning',
+  'home.goodAfternoon': 'Good afternoon',
+  'home.goodEvening': 'Good evening',
+  'home.totalAgents': 'Agents',
+  'home.devices': 'Devices',
+  'home.noAgents': 'No agents yet',
+  'home.createFirstAgent': 'Create your first AI agent to get started!',
+  'home.noSearchResults': 'No agents found',
+  'home.tryDifferentSearch': 'Try a different search term',
+  'home.clearSearch': 'Clear Search',
+  'home.noDescription': 'No description',
 
   // Parameter management page text
   'paramManagement.pageTitle': 'Parameter Management',
@@ -743,6 +759,7 @@ export default {
   'addAgentDialog.cancel': 'Cancel',
   'addAgentDialog.nameRequired': 'Please enter agent name',
   'addAgentDialog.addSuccess': 'Add successful',
+  'addAgentDialog.subtitle': 'Give your AI agent a name to get started',
 
   // Role configuration page text
   'roleConfig.title': 'Role Configuration',
@@ -790,6 +807,11 @@ export default {
   'roleConfig.audioPlayFailed': 'Audio playback failed',
   'roleConfig.cannotPlayAudio': 'Cannot play audio',
   'roleConfig.audioPlayError': 'Error occurred during audio playback',
+  'roleConfig.basicInfo': 'Basic Information',
+  'roleConfig.basicInfoDesc': 'Configure your agent\'s name, personality, and behavior',
+  'roleConfig.modelConfig': 'Model Configuration',
+  'roleConfig.modelConfigDesc': 'Select AI models that power your agent\'s capabilities',
+  'roleConfig.templateDesc': 'Quick start with pre-configured templates',
 
   // Function management dialog text
   'functionDialog.title': 'Function Management',

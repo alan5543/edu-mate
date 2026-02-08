@@ -468,6 +468,7 @@ export default {
   'device.deviceStatus': '狀態',
   'device.online': '在線',
   'device.offline': '離線',
+  'device.statusDesc': '管理和監控您的已連接設備',
 
   // 消息提示
   'message.success': '操作成功',
@@ -656,6 +657,7 @@ export default {
   'common.cancel': '取消',
   'common.sensitive': '敏感',
   'common.loading': '載入中',
+  'common.noData': '暫無數據',
 
   // 語言切換
   'language.zhCN': '中文简体',

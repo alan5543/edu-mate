@@ -1,28 +1,45 @@
 <template>
-  <el-dialog :visible="visible" @close="handleClose"  width="25%" center @open="handleOpen">
-    <div
-      style="margin: 0 10px 10px;display: flex;align-items: center;gap: 10px;font-weight: 700;font-size: 20px;text-align: left;color: #3d4566;">
-      <div
-        style="width: 40px;height: 40px;border-radius: 50%;background: #07c160;display: flex;align-items: center;justify-content: center;">
-        <img loading="lazy" src="@/assets/home/equipment.png" alt="" style="width: 18px;height: 15px;" />
+  <el-dialog 
+    :visible="visible" 
+    @close="handleClose" 
+    :width="dialogWidth"
+    custom-class="add-agent-dialog"
+    center 
+    @open="handleOpen"
+    :close-on-click-modal="false"
+  >
+    <div class="dialog-content">
+      <div class="dialog-header">
+        <div class="header-icon">
+          <i class="el-icon-plus"></i>
+        </div>
+        <h2 class="dialog-title">{{ $t('addAgentDialog.title') }}</h2>
+        <p class="dialog-subtitle">{{ $t('addAgentDialog.subtitle') || 'Give your AI agent a name to get started' }}</p>
       </div>
-      {{ $t('addAgentDialog.title') }}
-    </div>
-    <div style="height: 1px;background: #e8f0ff;" />
-    <div style="margin: 22px 15px;">
-      <div style="font-weight: 400;text-align: left;color: #3d4566;">
-        <div style="color: red;display: inline-block;">*</div> {{ $t('addAgentDialog.agentName') }}：
+      
+      <div class="form-group">
+        <label class="form-label">
+          <span class="required">*</span> {{ $t('addAgentDialog.agentName') }}
+        </label>
+        <el-input 
+          ref="inputRef" 
+          v-model="wisdomBodyName" 
+          :placeholder="$t('addAgentDialog.placeholder')"
+          class="agent-input"
+          @keyup.enter.native="confirm"
+          maxlength="50"
+          show-word-limit
+        />
       </div>
-      <div class="input-46" style="margin-top: 12px;">
-        <el-input ref="inputRef" :placeholder="$t('addAgentDialog.placeholder')" v-model="wisdomBodyName" @keyup.enter.native="confirm" />
-      </div>
-    </div>
-    <div style="display: flex;margin: 15px 15px;gap: 7px;">
-      <div class="dialog-btn" @click="confirm">
-        {{ $t('addAgentDialog.confirm') }}
-      </div>
-      <div class="dialog-btn" style="background: #E1F3D8;border: 1px solid #a1d586;color: #07c160;" @click="cancel">
-        {{ $t('addAgentDialog.cancel') }}
+      
+      <div class="dialog-actions">
+        <button class="btn btn-primary" @click="confirm">
+          <i class="el-icon-check"></i>
+          {{ $t('addAgentDialog.confirm') }}
+        </button>
+        <button class="btn btn-secondary" @click="cancel">
+          {{ $t('addAgentDialog.cancel') }}
+        </button>
       </div>
     </div>
   </el-dialog>
@@ -39,10 +56,26 @@ export default {
   data() {
     return {
       wisdomBodyName: "",
-      inputRef: null
+      windowWidth: window.innerWidth
     }
   },
+  computed: {
+    dialogWidth() {
+      if (this.windowWidth < 500) return '90%';
+      if (this.windowWidth < 768) return '80%';
+      return '420px';
+    }
+  },
+  mounted() {
+    window.addEventListener('resize', this.handleResize);
+  },
+  beforeDestroy() {
+    window.removeEventListener('resize', this.handleResize);
+  },
   methods: {
+    handleResize() {
+      this.windowWidth = window.innerWidth;
+    },
     handleOpen() {
       this.$nextTick(() => {
         this.$refs.inputRef.focus();
@@ -64,50 +97,199 @@ export default {
       });
     },
     cancel() {
-      this.$emit('update:visible', false)
-      this.wisdomBodyName = ""
+      this.$emit('update:visible', false);
+      this.wisdomBodyName = "";
     },
     handleClose() {
       this.$emit('update:visible', false);
-    },
+    }
   }
 }
 </script>
 
-<style scoped>
-.input-46 {
-  border: 1px solid #e4e6ef;
-  background: #f6f8fb;
-  border-radius: 15px;
+<style scoped lang="scss">
+$primary: #07c160;
+$primary-dark: #059652;
+$text-primary: #1a1a2e;
+$text-secondary: #4a4a68;
+$text-muted: #8e8ea9;
+$border: #e4e6ef;
+
+.dialog-content {
+  padding: 8px;
 }
 
-.dialog-btn {
-  cursor: pointer;
-  flex: 1;
-  border-radius: 23px;
-  background: #07c160;
-  height: 40px;
-  font-weight: 500;
-  font-size: 12px;
-  color: #fff;
-  line-height: 40px;
+.dialog-header {
   text-align: center;
+  margin-bottom: 28px;
 }
 
-::v-deep .el-dialog {
-  border-radius: 15px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+.header-icon {
+  width: 64px;
+  height: 64px;
+  margin: 0 auto 16px;
+  background: linear-gradient(135deg, $primary, #38f9d7);
+  border-radius: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 8px 24px rgba($primary, 0.25);
+  
+  i {
+    font-size: 28px;
+    color: white;
+  }
 }
 
-::v-deep .el-dialog__headerbtn {
+.dialog-title {
+  font-size: 22px;
+  font-weight: 700;
+  color: $text-primary;
+  margin: 0 0 8px;
+}
+
+.dialog-subtitle {
+  font-size: 14px;
+  color: $text-muted;
+  margin: 0;
+}
+
+.form-group {
+  margin-bottom: 24px;
+}
+
+.form-label {
+  display: block;
+  font-size: 14px;
+  font-weight: 600;
+  color: $text-secondary;
+  margin-bottom: 10px;
+  
+  .required {
+    color: #f56c6c;
+    margin-right: 4px;
+  }
+}
+
+.agent-input {
+  ::v-deep .el-input__inner {
+    height: 48px;
+    border-radius: 14px;
+    border: 2px solid $border;
+    padding: 0 16px;
+    font-size: 15px;
+    transition: all 0.2s;
+    
+    &:focus {
+      border-color: $primary;
+      box-shadow: 0 0 0 4px rgba($primary, 0.1);
+    }
+  }
+  
+  ::v-deep .el-input__count {
+    background: transparent;
+  }
+}
+
+.dialog-actions {
+  display: flex;
+  gap: 12px;
+}
+
+.btn {
+  flex: 1;
+  height: 48px;
+  border-radius: 14px;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  border: none;
+  
+  &.btn-primary {
+    background: $primary;
+    color: white;
+    box-shadow: 0 4px 16px rgba($primary, 0.3);
+    
+    &:hover {
+      background: $primary-dark;
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba($primary, 0.35);
+    }
+  }
+  
+  &.btn-secondary {
+    background: #f0f2f5;
+    color: $text-secondary;
+    border: 1px solid $border;
+    
+    &:hover {
+      background: #e8eaed;
+    }
+  }
+}
+
+@media (max-width: 480px) {
+  .dialog-content {
+    padding: 4px;
+  }
+  
+  .dialog-header {
+    margin-bottom: 20px;
+  }
+  
+  .header-icon {
+    width: 56px;
+    height: 56px;
+    border-radius: 16px;
+    
+    i {
+      font-size: 24px;
+    }
+  }
+  
+  .dialog-title {
+    font-size: 20px;
+  }
+  
+  .dialog-actions {
+    flex-direction: column;
+  }
+  
+  .btn {
+    height: 44px;
+  }
+}
+</style>
+
+<style>
+/* Global dialog styles - not scoped */
+.add-agent-dialog {
+  border-radius: 24px !important;
+  overflow: hidden;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15) !important;
+}
+
+.add-agent-dialog .el-dialog__header {
   display: none;
 }
 
-::v-deep .el-dialog__body {
-  padding: 4px 6px;
+.add-agent-dialog .el-dialog__body {
+  padding: 24px;
 }
 
-::v-deep .el-dialog__header {
-  padding: 10px;
+@media (max-width: 500px) {
+  .add-agent-dialog {
+    margin: 16px !important;
+    border-radius: 20px !important;
+  }
+  
+  .add-agent-dialog .el-dialog__body {
+    padding: 20px 16px;
+  }
 }
 </style>

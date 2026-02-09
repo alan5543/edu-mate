@@ -2,6 +2,7 @@ import os
 import re
 import uuid
 import queue
+import time
 import asyncio
 import threading
 import traceback
@@ -85,13 +86,21 @@ class TTSProviderBase(ABC):
 
     def to_tts_stream(self, text, opus_handler: Callable[[bytes], None] = None) -> None:
         text = MarkdownCleaner.clean_markdown(text)
+        text_len = len(text)
         max_repeat_time = 5
+        # [PERF] TTS timing start
+        tts_start_time = time.time()
         if self.delete_audio_file:
             # 需要删除文件的直接转为音频数据
             while max_repeat_time > 0:
                 try:
                     audio_bytes = asyncio.run(self.text_to_speak(text, None))
                     if audio_bytes:
+                        # [PERF] TTS timing log
+                        tts_duration = time.time() - tts_start_time
+                        logger.bind(tag=TAG).info(
+                            f"[PERF] TTS segment completed in {tts_duration:.3f}s | text_len={text_len}"
+                        )
                         self.tts_audio_queue.put((SentenceType.FIRST, None, text))
                         audio_bytes_to_data_stream(
                             audio_bytes,
@@ -134,6 +143,11 @@ class TTSProviderBase(ABC):
                         max_repeat_time -= 1
 
                 if max_repeat_time > 0:
+                    # [PERF] TTS timing log for file-based path
+                    tts_duration = time.time() - tts_start_time
+                    logger.bind(tag=TAG).info(
+                        f"[PERF] TTS segment completed in {tts_duration:.3f}s | text_len={text_len}"
+                    )
                     logger.bind(tag=TAG).info(
                         f"语音生成成功: {text}:{tmp_file}，重试{5 - max_repeat_time}次"
                     )

@@ -1,4 +1,10 @@
+import os
 import sys
+# Disable tqdm progress bars from FunASR/modelscope dependencies
+# This prevents AttributeError: 'tqdm' object has no attribute 'last_print_t'
+# and BlockingIOError in async environments
+os.environ["TQDM_DISABLE"] = "1"
+
 import uuid
 import signal
 import asyncio

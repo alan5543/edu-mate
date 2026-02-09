@@ -824,7 +824,7 @@ export default {
 
       this.modelOptions["Intent"].forEach((item) => {
         if (item.value === "Intent_function_call") {
-          if (llmType === "openai" || llmType === "ollama" || llmType === "perplexity") {
+          if (llmType === "openai" || llmType === "ollama" || llmType === "perplexity" || llmType === "gemini") {
             item.isHidden = false;
           } else {
             item.isHidden = true;
@@ -838,7 +838,8 @@ export default {
         this.form.model.intentModelId === "Intent_function_call" &&
         llmType !== "openai" &&
         llmType !== "ollama" &&
-        llmType !== "perplexity"
+        llmType !== "perplexity" &&
+        llmType !== "gemini"
       ) {
         const firstVisibleOption = this.modelOptions["Intent"].find(
           (item) => !item.isHidden

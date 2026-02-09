@@ -874,6 +874,10 @@ class ConnectionHandler:
         content_arguments = ""
         self.client_abort = False
         emotion_flag = True
+        # [PERF] LLM timing variables
+        llm_start_time = time.time()
+        llm_first_token_time = None
+        llm_total_chars = 0
         try:
             for response in llm_responses:
                 if self.client_abort:
@@ -905,6 +909,13 @@ class ConnectionHandler:
                     emotion_flag = False
 
                 if content is not None and len(content) > 0:
+                    # [PERF] Track first token time
+                    if llm_first_token_time is None:
+                        llm_first_token_time = time.time()
+                        self.logger.bind(tag=TAG).info(
+                            f"[PERF] LLM first token in {llm_first_token_time - llm_start_time:.3f}s | session={self.session_id}"
+                        )
+                    llm_total_chars += len(content)
                     if not tool_call_flag:
                         response_message.append(content)
                         self.tts.tts_text_queue.put(
@@ -934,6 +945,13 @@ class ConnectionHandler:
                     )
                 )
             return
+        
+        # [PERF] LLM completion timing log
+        llm_end_time = time.time()
+        self.logger.bind(tag=TAG).info(
+            f"[PERF] LLM completed in {llm_end_time - llm_start_time:.3f}s | total_chars={llm_total_chars} | session={self.session_id}"
+        )
+        
         # 处理function call
         if tool_call_flag:
             bHasError = False

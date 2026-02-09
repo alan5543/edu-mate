@@ -50,6 +50,6 @@ INSERT INTO `ai_model_config` VALUES ('Memory_mem_local_short', 'Memory', 'mem_l
 INSERT INTO `ai_model_config` VALUES ('Memory_mem0ai', 'Memory', 'mem0ai', 'Mem0AI记忆', 0, 1, '{\"type\": \"mem0ai\", \"api_key\": \"你的api_key\"}', NULL, NULL, 3, NULL, NULL, NULL, NULL);
 
 -- Intent模型配置
-INSERT INTO `ai_model_config` VALUES ('Intent_nointent', 'Intent', 'nointent', '无意图识别', 1, 0, '{\"type\": \"nointent\"}', NULL, NULL, 1, NULL, NULL, NULL, NULL);
+INSERT INTO `ai_model_config` VALUES ('Intent_nointent', 'Intent', 'nointent', '无意图识别', 1, 1, '{\"type\": \"nointent\"}', NULL, NULL, 1, NULL, NULL, NULL, NULL);
 INSERT INTO `ai_model_config` VALUES ('Intent_intent_llm', 'Intent', 'intent_llm', 'LLM意图识别', 0, 1, '{\"type\": \"intent_llm\", \"llm\": \"ChatGLMLLM\"}', NULL, NULL, 2, NULL, NULL, NULL, NULL);
 INSERT INTO `ai_model_config` VALUES ('Intent_function_call', 'Intent', 'function_call', '函数调用意图识别', 0, 1, '{\"type\": \"function_call\", \"functions\": [\"change_role\", \"get_weather\", \"get_news\", \"play_music\"]}', NULL, NULL, 3, NULL, NULL, NULL, NULL);

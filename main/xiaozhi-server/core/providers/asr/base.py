@@ -96,6 +96,7 @@ class ASRProviderBase(ABC):
                 wav_data = self._pcm_to_wav(combined_pcm_data)
 
             # 定义ASR任务
+            asr_start_time = time.monotonic()
             asr_task = self.speech_to_text_wrapper(
                 asr_audio_task, conn.session_id, conn.audio_format
             )
@@ -154,6 +155,12 @@ class ASRProviderBase(ABC):
                 # 构建包含说话人信息的JSON字符串
                 enhanced_text = self._build_enhanced_text(raw_text, speaker_name)
                 content_for_length_check = raw_text
+
+            # [PERF] ASR timing log
+            asr_duration = time.monotonic() - asr_start_time
+            logger.bind(tag=TAG).info(
+                f"[PERF] ASR completed in {asr_duration:.3f}s | session={conn.session_id}"
+            )
 
             # 性能监控
             total_time = time.monotonic() - total_start_time

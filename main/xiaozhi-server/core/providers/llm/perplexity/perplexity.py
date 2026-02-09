@@ -1,5 +1,6 @@
 import httpx
 import openai
+import re
 from openai.types import CompletionUsage
 from config.logger import setup_logging
 from core.utils.util import check_model_key
@@ -13,6 +14,10 @@ class LLMProvider(LLMProviderBase):
     def __init__(self, config):
         self.model_name = config.get("model_name", "sonar")
         self.api_key = config.get("api_key")
+        
+        # Option to strip citation markers like [1][2][3] from responses
+        # Default to True for voice assistant use cases
+        self.strip_citations = config.get("strip_citations", True)
         
         # Perplexity API base URL
         if "base_url" in config:
@@ -44,7 +49,7 @@ class LLMProvider(LLMProviderBase):
                 setattr(self, param, None)
 
         logger.bind(tag=TAG).info(
-            f"Perplexity Provider 初始化: model={self.model_name}, base_url={self.base_url}"
+            f"Perplexity Provider 初始化: model={self.model_name}, base_url={self.base_url}, strip_citations={self.strip_citations}"
         )
 
         model_key_msg = check_model_key("LLM", self.api_key)
@@ -56,6 +61,13 @@ class LLMProvider(LLMProviderBase):
             base_url=self.base_url, 
             timeout=httpx.Timeout(self.timeout)
         )
+
+    def _strip_citation_markers(self, text):
+        """Remove citation markers like [1], [2], [1][2][3] from text"""
+        if not self.strip_citations or not text:
+            return text
+        # Remove patterns like [1], [12], [123] etc.
+        return re.sub(r'\[\d+\]', '', text)
 
     @staticmethod
     def normalize_dialogue(dialogue):
@@ -105,7 +117,8 @@ class LLMProvider(LLMProviderBase):
                     is_active = True
                     content = content.split("</think>")[-1]
                 if is_active:
-                    yield content
+                    # Strip citation markers before yielding
+                    yield self._strip_citation_markers(content)
 
     def response_with_functions(self, session_id, dialogue, functions=None, **kwargs):
         dialogue = self.normalize_dialogue(dialogue)
@@ -138,6 +151,8 @@ class LLMProvider(LLMProviderBase):
             if getattr(chunk, "choices", None):
                 delta = chunk.choices[0].delta
                 content = getattr(delta, "content", "")
+                # Strip citation markers from content
+                content = self._strip_citation_markers(content) if content else content
                 tool_calls = getattr(delta, "tool_calls", None)
                 yield content, tool_calls
             elif isinstance(getattr(chunk, "usage", None), CompletionUsage):

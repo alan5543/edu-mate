@@ -103,6 +103,15 @@
                     "></el-input>
               </template>
 
+              <template v-else-if="field.type === 'boolean'">
+                <el-switch v-model="form.configJson[field.prop]" 
+                  :active-value="true" 
+                  :inactive-value="false"
+                  active-text="True"
+                  inactive-text="False"
+                  class="custom-switch"></el-switch>
+              </template>
+
               <el-input v-else v-model="form.configJson[field.prop]" :placeholder="field.placeholder" :type="field.type"
                 class="custom-input-bg" :show-password="field.type === 'password'" @focus="
                   isSensitiveField(field.prop)
@@ -329,8 +338,11 @@ export default {
                 ? "json-textarea"
                 : f.type === "password"
                   ? "password"
-                  : "text",
+                  : f.type === "boolean"
+                    ? "boolean"
+                    : "text",
             placeholder: `请输入${f.key}`,
+            defaultValue: f.default,
           }));
 
           if (this.pendingModelData && this.pendingProviderType === providerCode) {
@@ -345,7 +357,12 @@ export default {
       let configJson = model.configJson || {};
       this.dynamicCallInfoFields.forEach((field) => {
         if (!configJson.hasOwnProperty(field.prop)) {
-          configJson[field.prop] = "";
+          // Use default value for boolean fields, empty string for others
+          if (field.type === "boolean") {
+            configJson[field.prop] = field.defaultValue !== undefined ? field.defaultValue : true;
+          } else {
+            configJson[field.prop] = "";
+          }
         } else if (field.type === "json-textarea") {
           this.$set(
             this.fieldJsonMap,
@@ -353,6 +370,11 @@ export default {
             this.formatJson(configJson[field.prop])
           );
           configJson[field.prop] = this.ensureObject(configJson[field.prop]);
+        } else if (field.type === "boolean") {
+          // Keep boolean as boolean, convert string "true"/"false" if needed
+          if (typeof configJson[field.prop] === "string") {
+            configJson[field.prop] = configJson[field.prop].toLowerCase() === "true";
+          }
         } else if (typeof configJson[field.prop] !== "string") {
           configJson[field.prop] = String(configJson[field.prop]);
         }

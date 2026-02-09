@@ -104,6 +104,40 @@ class LLMProvider(LLMProviderBase):
         )
 
     @staticmethod
+    def _clean_schema(schema: Dict[str, Any]) -> Dict[str, Any]:
+        """
+        Remove schema fields not supported by Gemini API.
+        Gemini doesn't support: minimum, maximum, additionalProperties, default, examples, etc.
+        """
+        if not isinstance(schema, dict):
+            return schema
+        
+        # Fields not supported by Gemini
+        unsupported_fields = {
+            'minimum', 'maximum', 'minLength', 'maxLength', 
+            'additionalProperties', 'default', 'examples', 
+            'pattern', 'format', 'minItems', 'maxItems',
+            'uniqueItems', 'exclusiveMinimum', 'exclusiveMaximum'
+        }
+        
+        cleaned = {}
+        for key, value in schema.items():
+            if key in unsupported_fields:
+                continue
+            if key == 'properties' and isinstance(value, dict):
+                cleaned[key] = {
+                    k: LLMProvider._clean_schema(v) for k, v in value.items()
+                }
+            elif key == 'items' and isinstance(value, dict):
+                cleaned[key] = LLMProvider._clean_schema(value)
+            elif isinstance(value, dict):
+                cleaned[key] = LLMProvider._clean_schema(value)
+            else:
+                cleaned[key] = value
+        
+        return cleaned
+
+    @staticmethod
     def _build_tools(funcs: List[Dict[str, Any]] | None):
         if not funcs:
             return None
@@ -113,7 +147,7 @@ class LLMProvider(LLMProviderBase):
                     types.FunctionDeclaration(
                         name=f["function"]["name"],
                         description=f["function"]["description"],
-                        parameters=f["function"]["parameters"],
+                        parameters=LLMProvider._clean_schema(f["function"]["parameters"]),
                     )
                     for f in funcs
                 ]

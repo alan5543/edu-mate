@@ -306,23 +306,23 @@ $transition: 0.25s ease;
   }
 
   .logo-container {
-    height: 64px;
+    height: 80px;
     display: flex;
     align-items: center;
     padding: 0 16px;
     cursor: pointer;
     flex-shrink: 0;
     border-bottom: 1px solid $border-color;
-    gap: 8px;
+    gap: 10px;
     
     .logo-img {
-      width: 36px;
-      height: 36px;
+      width: 48px;
+      height: 48px;
       flex-shrink: 0;
     }
     
     .brand-img {
-      height: 56px;
+      height: 80px;
       object-fit: contain;
     }
   }

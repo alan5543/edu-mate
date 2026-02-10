@@ -522,3 +522,24 @@ databaseChangeLog:
         - sqlFile:
             encoding: utf8
             path: classpath:db/changelog/202602052238.sql
+  - changeSet:
+      id: 202602100130
+      author: antigravity
+      changes:
+        - sqlFile:
+            encoding: utf8
+            path: classpath:db/changelog/202602100130.sql
+  - changeSet:
+      id: 202602100137
+      author: antigravity
+      changes:
+        - sqlFile:
+            encoding: utf8
+            path: classpath:db/changelog/202602100137.sql
+  - changeSet:
+      id: 202602100138
+      author: antigravity
+      changes:
+        - sqlFile:
+            encoding: utf8
+            path: classpath:db/changelog/202602100138.sql

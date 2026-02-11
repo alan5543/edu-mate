@@ -112,6 +112,12 @@
                   class="custom-switch"></el-switch>
               </template>
 
+              <template v-else-if="field.type === 'select'">
+                <el-select v-model="form.configJson[field.prop]" :placeholder="field.placeholder" class="custom-select custom-input-bg" style="width: 100%">
+                  <el-option v-for="opt in field.options" :key="opt.value" :label="opt.label" :value="opt.value" />
+                </el-select>
+              </template>
+
               <el-input v-else v-model="form.configJson[field.prop]" :placeholder="field.placeholder" :type="field.type"
                 class="custom-input-bg" :show-password="field.type === 'password'" @focus="
                   isSensitiveField(field.prop)
@@ -340,9 +346,12 @@ export default {
                   ? "password"
                   : f.type === "boolean"
                     ? "boolean"
-                    : "text",
+                    : f.type === "select"
+                      ? "select"
+                      : "text",
             placeholder: `请输入${f.key}`,
             defaultValue: f.default,
+            options: f.options || [], // Add options for select type
           }));
 
           if (this.pendingModelData && this.pendingProviderType === providerCode) {

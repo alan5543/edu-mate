@@ -1,8 +1,8 @@
 // UI controller module
-import { loadConfig, saveConfig } from '../config/manager.js?v=0127';
-import { getAudioPlayer } from '../core/audio/player.js?v=0127';
-import { getAudioRecorder } from '../core/audio/recorder.js?v=0127';
-import { getWebSocketHandler } from '../core/network/websocket.js?v=0127';
+import { loadConfig, saveConfig } from '../config/manager.js?v=0212-4';
+import { getAudioPlayer } from '../core/audio/player.js?v=0212-4';
+import { getAudioRecorder } from '../core/audio/recorder.js?v=0212-4';
+import { getWebSocketHandler } from '../core/network/websocket.js?v=0212-4';
 
 // UI controller class
 class UIController {
@@ -80,6 +80,35 @@ class UIController {
         const backgroundBtn = document.getElementById('backgroundBtn');
         if (backgroundBtn) {
             backgroundBtn.addEventListener('click', this.switchBackground);
+        }
+
+        // Switch character button
+        const switchCharBtn = document.getElementById('switchCharBtn');
+        if (switchCharBtn) {
+            console.log('Switch character button found and listener attached');
+            switchCharBtn.addEventListener('click', () => {
+                console.log('Switch character button clicked');
+                if (!window.chatApp) {
+                    console.error('window.chatApp is not defined');
+                    alert('Error: ChatApp not initialized');
+                    return;
+                }
+                if (!window.chatApp.live2dManager) {
+                    console.error('window.chatApp.live2dManager is not defined');
+                    alert('Error: Live2D Manager not initialized. Check console for errors.');
+                    return;
+                }
+
+                console.log('Calling switchCharacter...');
+                window.chatApp.live2dManager.switchCharacter().then(() => {
+                    console.log('switchCharacter completed');
+                }).catch(err => {
+                    console.error('switchCharacter failed:', err);
+                    alert('Failed to switch character: ' + err.message);
+                });
+            });
+        } else {
+            console.error('Switch character button NOT found in DOM');
         }
 
         // Dial button
@@ -453,7 +482,7 @@ class UIController {
 
             if (isConnected) {
                 // Check microphone availability (check again after connection)
-                const { checkMicrophoneAvailability } = await import('../core/audio/recorder.js?v=0127');
+                const { checkMicrophoneAvailability } = await import('../core/audio/recorder.js?v=0212-4');
                 const micAvailable = await checkMicrophoneAvailability();
 
                 if (!micAvailable) {

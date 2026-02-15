@@ -40,6 +40,23 @@ class Live2DManager {
         this._downArea = 'Body';
         this._movedBeyondClick = false;
         this._swipeMinDist = 24; // 触发滑动的最小距离
+
+        // 模型配置
+        this.models = {
+            'cat': {
+                path: 'LittleCat/LittleCat.model3.json',
+                x: 0, // x offset (relative to center)
+                y: 250,
+                scale: 0.33
+            },
+            'girl': {
+                path: 'hiyori_pro_zh/runtime/hiyori_pro_t11.model3.json',
+                x: 0,
+                y: 0,
+                scale: 0.25
+            }
+        };
+        this.currentModelKey = localStorage.getItem('live2d_model_key') || 'cat';
     }
 
     /**
@@ -62,227 +79,16 @@ class Live2DManager {
                 backgroundAlpha: 0,
             });
 
-            // 加载 Live2D 模型 - 动态检测当前目录，适配不同环境
-            // 获取当前HTML文件所在的目录路径
-            const currentPath = window.location.pathname;
-            const lastSlashIndex = currentPath.lastIndexOf('/');
-            const basePath = currentPath.substring(0, lastSlashIndex + 1);
-            const modelPath = basePath + 'hiyori_pro_zh/runtime/hiyori_pro_t11.model3.json';
-            this.live2dModel = await PIXI.live2d.Live2DModel.from(modelPath);
-            this.live2dApp.stage.addChild(this.live2dModel);
-
-            // 设置模型属性
-            this.live2dModel.scale.set(0.33);
-            this.live2dModel.x = (window.innerWidth - this.live2dModel.width) * 0.5;
-            this.live2dModel.y = -50;
-
-            // 启用交互并监听点击命中（头部/身体等）
-
-            this.live2dModel.interactive = true;
-
-
-            this.live2dModel.on('doublehit', (args) => {
-                const area = Array.isArray(args) ? args[0] : args;
-
-                // 触发双击动作
-                if (area === 'Body') {
-                    this.motion('Flick@Body');
-                } else if (area === 'Head' || area === 'Face') {
-                    this.motion('Flick');
-                }
-
-                const app = window.chatApp;
-                const payload = JSON.stringify({ type: 'live2d', event: 'doublehit', area });
-                if (app && app.dataChannel && app.dataChannel.readyState === 'open') {
-                    app.dataChannel.send(payload);
-                }
-
-            });
-
-            this.live2dModel.on('singlehit', (args) => {
-                const area = Array.isArray(args) ? args[0] : args;
-
-                // 触发单击动作
-                if (area === 'Body') {
-                    this.motion('Tap@Body');
-                } else if (area === 'Head' || area === 'Face') {
-                    this.motion('Tap');
-                }
-
-                const app = window.chatApp;
-                const payload = JSON.stringify({ type: 'live2d', event: 'singlehit', area });
-                if (app && app.dataChannel && app.dataChannel.readyState === 'open') {
-                    app.dataChannel.send(payload);
-                }
-
-            });
-
-            this.live2dModel.on('swipe', (args) => {
-                const area = Array.isArray(args) ? args[0] : args;
-                const dir = Array.isArray(args) ? args[1] : undefined;
-
-                // 触发滑动动作
-                if (area === 'Body') {
-                    if (dir === 'up') {
-                        this.motion('FlickUp');
-                    } else if (dir === 'down') {
-                        this.motion('FlickDown');
-                    }
-                } else if (area === 'Head' || area === 'Face') {
-                    if (dir === 'up') {
-                        this.motion('FlickUp');
-                    } else if (dir === 'down') {
-                        this.motion('FlickDown');
-                    }
-                }
-
-                const app = window.chatApp;
-                const payload = JSON.stringify({ type: 'live2d', event: 'swipe', area, dir });
-                if (app && app.dataChannel && app.dataChannel.readyState === 'open') {
-                    app.dataChannel.send(payload);
-                }
-
-            });
-
-            // 兜底：自定义"头部/身体"命中区域 + 单/双击/滑动区分
-            this.live2dModel.on('pointerdown', (event) => {
-                try {
-                    const global = event.data.global;
-                    const bounds = this.live2dModel.getBounds();
-                    // 仅在点击落在模型可见范围内时判定
-                    if (!bounds || !bounds.contains(global.x, global.y)) return;
-
-                    const relX = (global.x - bounds.x) / (bounds.width || 1);
-                    const relY = (global.y - bounds.y) / (bounds.height || 1);
-                    let area = '';
-                    // 经验阈值：模型可见矩形的上部 20% 视为"头部"区域
-                    if (relX >= 0.4 && relX <= 0.6) {
-                        if (relY <= 0.15) {
-                            area = 'Head';
-                        } else if (relY <= 0.23) {
-                            area = 'Face';
-                        } else {
-                            area = 'Body';
-                        }
-                    }
-                    if (area === '') {
-                        return;
-                    }
-
-                    // 记录按下状态用于滑动判定
-                    this._pointerDown = true;
-                    this._downPos = { x: global.x, y: global.y };
-                    this._downTime = performance.now();
-                    this._downArea = area;
-                    this._movedBeyondClick = false;
-
-                    const now = performance.now();
-                    const dt = now - (this._lastClickTime || 0);
-                    const dx = global.x - (this._lastClickPos?.x || 0);
-                    const dy = global.y - (this._lastClickPos?.y || 0);
-                    const dist = Math.hypot(dx, dy);
-
-                    // 命中确认：仅当点击在模型上时做单/双击判断
-                    if (this._lastClickTime && dt <= this._doubleClickMs && dist <= this._doubleClickDist) {
-                        // 判定为双击：取消待触发的单击事件
-                        if (this._singleClickTimer) {
-                            clearTimeout(this._singleClickTimer);
-                            this._singleClickTimer = null;
-                        }
-                        if (typeof this.live2dModel.emit === 'function') {
-                            this.live2dModel.emit('doublehit', [area]);
-                        }
-                        this._lastClickTime = 0;
-                        this._pointerDown = false; // 双击完成，重置状态
-                        return;
-                    }
-
-                    // 可能是单击：记录并延迟确认
-                    this._lastClickTime = now;
-                    this._lastClickPos = { x: global.x, y: global.y };
-                    if (this._singleClickTimer) {
-                        clearTimeout(this._singleClickTimer);
-                        this._singleClickTimer = null;
-                    }
-                    this._singleClickTimer = setTimeout(() => {
-                        // 若在等待期间发生了移动超过阈值，则不再当作单击
-                        if (!this._movedBeyondClick && typeof this.live2dModel.emit === 'function') {
-                            this.live2dModel.emit('singlehit', [area]);
-                        }
-                        this._singleClickTimer = null;
-                        this._lastClickTime = 0;
-                    }, this._doubleClickMs);
-                } catch (e) {
-                    // 忽略自定义命中判断中的异常，避免影响主流程
-                }
-            });
-
-            // 指针移动：用于判定是否从"点击"升级为"滑动"
-            this.live2dModel.on('pointermove', (event) => {
-                try {
-                    if (!this._pointerDown) return;
-                    const global = event.data.global;
-                    const dx = global.x - this._downPos.x;
-                    const dy = global.y - this._downPos.y;
-                    const dist = Math.hypot(dx, dy);
-
-                    // 使用 _doubleClickDist 作为点击/滑动的判定阈值
-                    if (dist > this._doubleClickDist) {
-                        this._movedBeyondClick = true;
-                        // 若已超出点击阈值，取消可能的单击触发
-                        if (this._singleClickTimer) {
-                            clearTimeout(this._singleClickTimer);
-                            this._singleClickTimer = null;
-                        }
-                        this._lastClickTime = 0;
-                    }
-                } catch (e) {
-                    // 忽略移动判定中的异常
-                }
-            });
-
-            // 指针抬起：确认是否为滑动
-            const handlePointerUp = (event) => {
-                try {
-                    if (!this._pointerDown) return;
-                    const global = (event && event.data && event.data.global) ? event.data.global : { x: this._downPos.x, y: this._downPos.y };
-                    const dx = global.x - this._downPos.x;
-                    const dy = global.y - this._downPos.y;
-                    const dist = Math.hypot(dx, dy);
-
-                    // 滑动：超过滑动最小距离则触发 swipe 事件（携带方向与区域）
-                    if (this._movedBeyondClick && dist >= this._swipeMinDist) {
-                        if (typeof this.live2dModel.emit === 'function') {
-                            const dir = Math.abs(dx) >= Math.abs(dy)
-                                ? (dx > 0 ? 'right' : 'left')
-                                : (dy > 0 ? 'down' : 'up');
-                            this.live2dModel.emit('swipe', [this._downArea, dir]);
-                        }
-                        // 终止：不再让单击/双击触发
-                        if (this._singleClickTimer) {
-                            clearTimeout(this._singleClickTimer);
-                            this._singleClickTimer = null;
-                        }
-                        this._lastClickTime = 0;
-                    }
-                } catch (e) {
-                    // 忽略抬起判定中的异常
-                }
-                finally {
-                    this._pointerDown = false;
-                    this._movedBeyondClick = false;
-                }
-            };
-
-            this.live2dModel.on('pointerup', handlePointerUp);
-            this.live2dModel.on('pointerupoutside', handlePointerUp);
+            // 加载 Live2D 模型
+            await this.loadModel(this.currentModelKey);
 
             // 添加窗口大小变化监听器，保持模型在Canvas中间和底部
             window.addEventListener('resize', () => {
                 if (this.live2dModel) {
+                    const config = this.models[this.currentModelKey];
                     // 使用窗口实际尺寸重新计算模型位置
-                    this.live2dModel.x = (window.innerWidth - this.live2dModel.width) * 0.5;
-                    this.live2dModel.y = -50;
+                    this.live2dModel.x = (window.innerWidth - this.live2dModel.width) * 0.5 + (config.x || 0);
+                    this.live2dModel.y = config.y;
                 }
             });
 
@@ -290,6 +96,237 @@ class Live2DManager {
             console.error('加载 Live2D 模型失败:', err);
         }
     }
+
+    /**
+     * 加载指定模型
+     * @param {string} key - 模型key ('cat' or 'girl')
+     */
+    async loadModel(key) {
+        if (!this.models[key]) {
+            console.error('未找到模型配置:', key);
+            return;
+        }
+
+        const config = this.models[key];
+        localStorage.setItem('live2d_model_key', key);
+        this.currentModelKey = key;
+
+        try {
+            // 如果已有模型，先移除并销毁
+            if (this.live2dModel) {
+                this.live2dApp.stage.removeChild(this.live2dModel);
+                this.live2dModel.destroy();
+                this.live2dModel = null;
+            }
+
+            // 获取当前HTML文件所在的目录路径
+            const currentPath = window.location.pathname;
+            const lastSlashIndex = currentPath.lastIndexOf('/');
+            const basePath = currentPath.substring(0, lastSlashIndex + 1);
+            const modelPath = basePath + config.path;
+
+            console.log(`Loading model: ${key}, path: ${modelPath}`);
+
+            this.live2dModel = await PIXI.live2d.Live2DModel.from(modelPath);
+            this.live2dApp.stage.addChild(this.live2dModel);
+
+            // 设置模型属性
+            this.live2dModel.scale.set(config.scale);
+            this.live2dModel.x = (window.innerWidth - this.live2dModel.width) * 0.5 + (config.x || 0);
+            this.live2dModel.y = config.y;
+
+            // 重新绑定事件监听
+            this.bindModelEvents();
+
+        } catch (err) {
+            console.error(`加载模型 ${key} 失败:`, err);
+        }
+    }
+
+    /**
+     * 绑定模型事件
+     */
+    bindModelEvents() {
+        if (!this.live2dModel) return;
+
+        // 启用交互
+        this.live2dModel.interactive = true;
+
+        // 重新绑定点击/滑动等事件
+        this.live2dModel.on('doublehit', (args) => {
+            const area = Array.isArray(args) ? args[0] : args;
+            if (area === 'Body') {
+                this.motion('Flick@Body');
+            } else if (area === 'Head' || area === 'Face') {
+                this.motion('Flick');
+            }
+            const app = window.chatApp;
+            const payload = JSON.stringify({ type: 'live2d', event: 'doublehit', area });
+            if (app && app.dataChannel && app.dataChannel.readyState === 'open') {
+                app.dataChannel.send(payload);
+            }
+        });
+
+        this.live2dModel.on('singlehit', (args) => {
+            const area = Array.isArray(args) ? args[0] : args;
+            if (area === 'Body') {
+                this.motion('Tap@Body');
+            } else if (area === 'Head' || area === 'Face') {
+                this.motion('Tap');
+            }
+            const app = window.chatApp;
+            const payload = JSON.stringify({ type: 'live2d', event: 'singlehit', area });
+            if (app && app.dataChannel && app.dataChannel.readyState === 'open') {
+                app.dataChannel.send(payload);
+            }
+        });
+
+        this.live2dModel.on('swipe', (args) => {
+            const area = Array.isArray(args) ? args[0] : args;
+            const dir = Array.isArray(args) ? args[1] : undefined;
+            if (area === 'Body') {
+                if (dir === 'up') this.motion('FlickUp');
+                else if (dir === 'down') this.motion('FlickDown');
+            } else if (area === 'Head' || area === 'Face') {
+                if (dir === 'up') this.motion('FlickUp');
+                else if (dir === 'down') this.motion('FlickDown');
+            }
+            const app = window.chatApp;
+            const payload = JSON.stringify({ type: 'live2d', event: 'swipe', area, dir });
+            if (app && app.dataChannel && app.dataChannel.readyState === 'open') {
+                app.dataChannel.send(payload);
+            }
+        });
+
+        // 绑定自定义指针事件 (复用之前的逻辑)
+        this.live2dModel.on('pointerdown', (event) => this.handlePointerDown(event));
+        this.live2dModel.on('pointermove', (event) => this.handlePointerMove(event));
+        const handlePointerUp = (event) => this.handlePointerUp(event);
+        this.live2dModel.on('pointerup', handlePointerUp);
+        this.live2dModel.on('pointerupoutside', handlePointerUp);
+    }
+
+    /**
+     * 切换角色
+     */
+    async switchCharacter() {
+        const keys = Object.keys(this.models);
+        const currentIndex = keys.indexOf(this.currentModelKey);
+        const nextIndex = (currentIndex + 1) % keys.length;
+        const nextKey = keys[nextIndex];
+        await this.loadModel(nextKey);
+    }
+
+    // 将原本内联的事件处理抽取为方法，以便在切换模型时复用
+    handlePointerDown(event) {
+        try {
+            const global = event.data.global;
+            const bounds = this.live2dModel.getBounds();
+            if (!bounds || !bounds.contains(global.x, global.y)) return;
+
+            const relX = (global.x - bounds.x) / (bounds.width || 1);
+            const relY = (global.y - bounds.y) / (bounds.height || 1);
+            let area = '';
+            if (relX >= 0.4 && relX <= 0.6) {
+                if (relY <= 0.15) {
+                    area = 'Head';
+                } else if (relY <= 0.23) {
+                    area = 'Face';
+                } else {
+                    area = 'Body';
+                }
+            }
+            if (area === '') return;
+
+            this._pointerDown = true;
+            this._downPos = { x: global.x, y: global.y };
+            this._downTime = performance.now();
+            this._downArea = area;
+            this._movedBeyondClick = false;
+
+            const now = performance.now();
+            const dt = now - (this._lastClickTime || 0);
+            const dx = global.x - (this._lastClickPos?.x || 0);
+            const dy = global.y - (this._lastClickPos?.y || 0);
+            const dist = Math.hypot(dx, dy);
+
+            if (this._lastClickTime && dt <= this._doubleClickMs && dist <= this._doubleClickDist) {
+                if (this._singleClickTimer) {
+                    clearTimeout(this._singleClickTimer);
+                    this._singleClickTimer = null;
+                }
+                if (typeof this.live2dModel.emit === 'function') {
+                    this.live2dModel.emit('doublehit', [area]);
+                }
+                this._lastClickTime = 0;
+                this._pointerDown = false;
+                return;
+            }
+
+            this._lastClickTime = now;
+            this._lastClickPos = { x: global.x, y: global.y };
+            if (this._singleClickTimer) {
+                clearTimeout(this._singleClickTimer);
+                this._singleClickTimer = null;
+            }
+            this._singleClickTimer = setTimeout(() => {
+                if (!this._movedBeyondClick && typeof this.live2dModel.emit === 'function') {
+                    this.live2dModel.emit('singlehit', [area]);
+                }
+                this._singleClickTimer = null;
+                this._lastClickTime = 0;
+            }, this._doubleClickMs);
+        } catch (e) { }
+    }
+
+    handlePointerMove(event) {
+        try {
+            if (!this._pointerDown) return;
+            const global = event.data.global;
+            const dx = global.x - this._downPos.x;
+            const dy = global.y - this._downPos.y;
+            const dist = Math.hypot(dx, dy);
+
+            if (dist > this._doubleClickDist) {
+                this._movedBeyondClick = true;
+                if (this._singleClickTimer) {
+                    clearTimeout(this._singleClickTimer);
+                    this._singleClickTimer = null;
+                }
+                this._lastClickTime = 0;
+            }
+        } catch (e) { }
+    }
+
+    handlePointerUp(event) {
+        try {
+            if (!this._pointerDown) return;
+            const global = (event && event.data && event.data.global) ? event.data.global : { x: this._downPos.x, y: this._downPos.y };
+            const dx = global.x - this._downPos.x;
+            const dy = global.y - this._downPos.y;
+            const dist = Math.hypot(dx, dy);
+
+            if (this._movedBeyondClick && dist >= this._swipeMinDist) {
+                if (typeof this.live2dModel.emit === 'function') {
+                    const dir = Math.abs(dx) >= Math.abs(dy)
+                        ? (dx > 0 ? 'right' : 'left')
+                        : (dy > 0 ? 'down' : 'up');
+                    this.live2dModel.emit('swipe', [this._downArea, dir]);
+                }
+                if (this._singleClickTimer) {
+                    clearTimeout(this._singleClickTimer);
+                    this._singleClickTimer = null;
+                }
+                this._lastClickTime = 0;
+            }
+        } catch (e) {
+        } finally {
+            this._pointerDown = false;
+            this._movedBeyondClick = false;
+        }
+    }
+
+
 
     /**
      * 初始化音频分析器 - 使用音频播放器的分析器节点

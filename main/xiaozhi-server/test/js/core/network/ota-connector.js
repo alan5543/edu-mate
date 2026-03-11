@@ -1,4 +1,4 @@
-import { log } from '../../utils/logger.js?v=0212-4';
+import { log } from '../../utils/logger.js?v=0310-1';
 
 // WebSocket 连接
 export async function webSocketConnect(otaUrl, config) {

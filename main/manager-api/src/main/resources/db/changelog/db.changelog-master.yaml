@@ -402,13 +402,7 @@ databaseChangeLog:
         - sqlFile:
             encoding: utf8
             path: classpath:db/changelog/202510191042.sql
-  - changeSet:
-      id: 202510250956
-      author: rainv123
-      changes:
-        - sqlFile:
-            encoding: utf8
-            path: classpath:db/changelog/202510250956.sql
+
   - changeSet:
       id: 202510251150
       author: rainv123
@@ -416,13 +410,7 @@ databaseChangeLog:
         - sqlFile:
             encoding: utf8
             path: classpath:db/changelog/202510251150.sql
-  - changeSet:
-      id: 202511131023
-      author: hrz
-      changes:
-        - sqlFile:
-            encoding: utf8
-            path: classpath:db/changelog/202511131023.sql
+
   - changeSet:
       id: 202511221450
       author: RanChen
@@ -578,3 +566,59 @@ databaseChangeLog:
         - sqlFile:
             encoding: utf8
             path: classpath:db/changelog/202602100300.sql
+  - changeSet:
+      id: 202603101200
+      author: antigravity
+      changes:
+        - sqlFile:
+            encoding: utf8
+            path: classpath:db/changelog/202603101200.sql
+  - changeSet:
+      id: 202603101210
+      author: antigravity
+      changes:
+        - sqlFile:
+            encoding: utf8
+            path: classpath:db/changelog/202603101210.sql
+  - changeSet:
+      id: 202603101830
+      author: antigravity
+      changes:
+        - sqlFile:
+            encoding: utf8
+            path: classpath:db/changelog/202603101830.sql
+  - changeSet:
+      id: 202603101840
+      author: antigravity
+      changes:
+        - sqlFile:
+            encoding: utf8
+            path: classpath:db/changelog/202603101840.sql
+  - changeSet:
+      id: 202603101845
+      author: antigravity
+      changes:
+        - sqlFile:
+            encoding: utf8
+            path: classpath:db/changelog/202603101845.sql
+  - changeSet:
+      id: 202603101900
+      author: antigravity
+      changes:
+        - sqlFile:
+            encoding: utf8
+            path: classpath:db/changelog/202603101900.sql
+  - changeSet:
+      id: 202603102200
+      author: antigravity
+      changes:
+        - sqlFile:
+            encoding: utf8
+            path: classpath:db/changelog/202603102200_upgrade_minimax_tts.sql
+  - changeSet:
+      id: 202603102205
+      author: antigravity
+      changes:
+        - sqlFile:
+            encoding: utf8
+            path: classpath:db/changelog/202603102205_add_minimax_cantonese_voices.sql

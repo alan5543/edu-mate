@@ -1,108 +1,131 @@
 <template>
   <el-drawer :visible.sync="dialogVisible" direction="rtl" size="80%" :wrapperClosable="false" :withHeader="false">
-    <!-- 自定义标题区域 -->
-    <div class="custom-header">
-      <div class="header-left">
-        <h3 class="bold-title">{{ $t('functionDialog.title') }}</h3>
+    <div class="drawer-wrapper">
+      <!-- 自定义标题区域 -->
+      <div class="custom-header">
+        <div class="header-left">
+          <h3 class="bold-title">{{ $t('functionDialog.title') }}</h3>
+        </div>
+        <button class="custom-close-btn" @click="closeDialog">×</button>
       </div>
-      <button class="custom-close-btn" @click="closeDialog">×</button>
-    </div>
 
     <div class="function-manager">
-      <!-- 左侧：未选功能 -->
-      <div class="function-column">
-        <div class="column-header">
-          <h4 class="column-title">{{ $t('functionDialog.unselectedFunctions') }}</h4>
-          <el-button type="text" @click="selectAll" class="select-all-btn">
-            {{ $t('functionDialog.selectAll') }}
-          </el-button>
-        </div>
-        <div class="function-list">
-          <div v-if="unselected.length">
-            <div v-for="func in unselected" :key="func.name" class="function-item">
-              <el-checkbox :label="func.name" v-model="selectedNames" @change="(val) => handleCheckboxChange(func, val)"
-                @click.native.stop></el-checkbox>
-              <div class="func-tag" @click="handleFunctionClick(func)">
-                <div class="color-dot"></div>
-                <span>{{ func.name }}</span>
+      <el-row :gutter="20" class="responsive-row">
+        <!-- 左侧：未选功能 -->
+        <el-col :xs="24" :sm="12" :md="8" class="responsive-col">
+          <el-card class="box-card function-card" shadow="never">
+            <div slot="header" class="column-header">
+              <span class="column-title">{{ $t('functionDialog.unselectedFunctions') }}</span>
+              <el-button type="text" @click="selectAll" class="select-all-btn">
+                {{ $t('functionDialog.selectAll') }}
+              </el-button>
+            </div>
+            <div class="function-list">
+              <div v-if="unselected.length">
+                <div v-for="func in unselected" :key="func.name" class="function-item">
+                  <el-checkbox :label="func.name" v-model="selectedNames" @change="(val) => handleCheckboxChange(func, val)"
+                    @click.native.stop></el-checkbox>
+                  <div class="func-tag" @click="handleFunctionClick(func)">
+                    <div class="color-dot" style="margin-top: 5px; align-self: flex-start;"></div>
+                    <div style="display: flex; flex-direction: column;">
+                      <span>{{ func.name }}</span>
+                      <span v-if="func.description" style="font-size: 12px; color: #909399; margin-top: 2px;">{{ func.description }}</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div v-else style="display: flex; justify-content: center; align-items: center;">
+                <el-empty :description="$t('functionDialog.noMorePlugins')" />
               </div>
             </div>
-          </div>
-          <div v-else style="display: flex; justify-content: center; align-items: center;">
-            <el-empty :description="$t('functionDialog.noMorePlugins')" />
-          </div>
-        </div>
-      </div>
+          </el-card>
+        </el-col>
 
-      <!-- 中间：已选功能 -->
-      <div class="function-column">
-        <div class="column-header">
-          <h4 class="column-title">{{ $t('functionDialog.selectedFunctions') }}</h4>
-          <el-button type="text" @click="deselectAll" class="select-all-btn">
-            {{ $t('functionDialog.selectAll') }}
-          </el-button>
-        </div>
-        <div class="function-list">
-          <div v-if="selectedList.length > 0">
-            <div v-for="func in selectedList" :key="func.name" class="function-item">
-              <el-checkbox :label="func.name" v-model="selectedNames" @change="(val) => handleCheckboxChange(func, val)"
-                @click.native.stop></el-checkbox>
-              <div class="func-tag" @click="handleFunctionClick(func)">
-                <div class="color-dot"></div>
-                <span>{{ func.name }}</span>
+        <!-- 中间：已选功能 -->
+        <el-col :xs="24" :sm="12" :md="8" class="responsive-col">
+          <el-card class="box-card function-card" shadow="never">
+            <div slot="header" class="column-header">
+              <span class="column-title">{{ $t('functionDialog.selectedFunctions') }}</span>
+              <el-button type="text" @click="deselectAll" class="select-all-btn">
+                {{ $t('functionDialog.selectAll') }}
+              </el-button>
+            </div>
+            <div class="function-list">
+              <div v-if="selectedList.length > 0">
+                <div v-for="func in selectedList" :key="func.name" class="function-item">
+                  <el-checkbox :label="func.name" v-model="selectedNames" @change="(val) => handleCheckboxChange(func, val)"
+                    @click.native.stop></el-checkbox>
+                  <div class="func-tag" @click="handleFunctionClick(func)">
+                    <div class="color-dot" style="margin-top: 5px; align-self: flex-start;"></div>
+                    <div style="display: flex; flex-direction: column;">
+                      <span>{{ func.name }}</span>
+                      <span v-if="func.description" style="font-size: 12px; color: #909399; margin-top: 2px;">{{ func.description }}</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div v-else style="display: flex; justify-content: center; align-items: center;">
+                <el-empty :description="$t('functionDialog.pleaseSelectPlugin')" />
               </div>
             </div>
-          </div>
-          <div v-else style="display: flex; justify-content: center; align-items: center;">
-            <el-empty :description="$t('functionDialog.pleaseSelectPlugin')" />
-          </div>
-        </div>
-      </div>
+          </el-card>
+        </el-col>
 
-      <!-- 右侧：参数配置 -->
-      <div class="params-column">
-        <h4 v-if="currentFunction" class="column-title">
-          {{ $t('functionDialog.paramConfig') }} - {{ currentFunction.name }}
-        </h4>
-        <div v-if="currentFunction" class="params-container">
-          <el-form :model="currentFunction" class="param-form">
-            <!-- 遍历 fieldsMeta，而不是 params 的 keys -->
-            <div v-if="currentFunction.fieldsMeta.length == 0">
-              <el-empty :description="currentFunction.name + $t('functionDialog.noNeedToConfig')" />
+        <!-- 右侧：参数配置 -->
+        <el-col :xs="24" :sm="24" :md="8" class="responsive-col">
+          <el-card class="box-card params-card" shadow="never">
+            <div slot="header" class="column-header">
+              <span v-if="currentFunction" class="column-title">
+                {{ $t('functionDialog.paramConfig') }} - {{ currentFunction.name }}
+              </span>
+              <span v-else class="column-title">{{ $t('functionDialog.paramConfig') }}</span>
             </div>
-            <el-form-item v-for="field in currentFunction.fieldsMeta" :key="field.key" :label="field.label"
-              class="param-item" :class="{ 'textarea-field': field.type === 'array' || field.type === 'json' }">
-              <template #label>
-                <span style="font-size: 16px; margin-right: 6px;">{{ field.label }}</span>
-                <el-tooltip effect="dark" :content="fieldRemark(field)" placement="top">
-                  <img src="@/assets/home/info.png" alt="" class="info-icon">
-                </el-tooltip>
-              </template>
-              <!-- ARRAY -->
-              <el-input v-if="field.type === 'array'" type="textarea" v-model="currentFunction.params[field.key]"
-                @change="val => handleParamChange(currentFunction, field.key, val)" />
+            
+            <div v-if="currentFunction" class="params-container">
+              <el-form :model="editingParams" class="param-form">
+                <!-- 遍历 fieldsMeta -->
+                <div v-if="currentFunction.fieldsMeta.length == 0">
+                  <el-empty :description="currentFunction.name + $t('functionDialog.noNeedToConfig')" />
+                </div>
+                
+                <el-form-item v-for="field in currentFunction.fieldsMeta" :key="field.key" :label="field.label"
+                  class="param-item" :class="{ 'textarea-field': field.type === 'array' || field.type === 'json' }">
+                  <template #label>
+                    <span style="font-size: 16px; margin-right: 6px;">{{ field.label }}</span>
+                    <el-tooltip effect="dark" :content="fieldRemark(field)" placement="top">
+                      <img src="@/assets/home/info.png" alt="" class="info-icon">
+                    </el-tooltip>
+                  </template>
 
-              <!-- JSON -->
-              <el-input v-else-if="field.type === 'json'" type="textarea" :rows="6" placeholder="请输入合法的 JSON"
-                v-model="textCache[field.key]" @blur="flushJson(field)" />
+                  <!-- ARRAY -->
+                  <el-input v-if="field.type === 'array'" type="textarea" v-model="editingParams[field.key]"
+                    @input="val => handleParamInput(field.key, val)" />
 
-              <!-- number -->
-              <el-input-number v-else-if="field.type === 'number'" :value="currentFunction.params[field.key]"
-                @change="val => handleParamChange(currentFunction, field.key, val)" />
+                  <!-- JSON -->
+                  <el-input v-else-if="field.type === 'json'" type="textarea" :rows="6" placeholder="请输入合法的 JSON"
+                    v-model="textCache[field.key]" @blur="flushJson(field)" />
 
-              <!-- boolean -->
-              <el-switch v-else-if="field.type === 'boolean' || field.type === 'bool'"
-                :value="currentFunction.params[field.key]"
-                @change="val => handleParamChange(currentFunction, field.key, val)" />
+                  <!-- number -->
+                  <div v-else-if="field.type === 'number'" class="custom-number-input el-input el-input--medium">
+                    <input type="number" class="el-input__inner" v-model.number="editingParams[field.key]"
+                      @input="e => handleParamInput(field.key, Number(e.target.value))" />
+                  </div>
 
-              <!-- string or fallback -->
-              <el-input v-else v-model="currentFunction.params[field.key]"
-                @change="val => handleParamChange(currentFunction, field.key, val)" />
-            </el-form-item>
-          </el-form>
-        </div>
-        <div v-else class="empty-tip">{{ $t('functionDialog.pleaseSelectFunctionForParam') }}</div>
-      </div>
+                  <!-- boolean -->
+                  <el-switch v-else-if="field.type === 'boolean' || field.type === 'bool'"
+                    v-model="editingParams[field.key]"
+                    @change="val => handleParamInput(field.key, val)" />
+
+                  <!-- string or fallback -->
+                  <el-input v-else v-model="editingParams[field.key]"
+                    @input="val => handleParamInput(field.key, val)" />
+                </el-form-item>
+              </el-form>
+            </div>
+            <div v-else class="empty-tip">{{ $t('functionDialog.pleaseSelectFunctionForParam') }}</div>
+          </el-card>
+        </el-col>
+      </el-row>
     </div>
 
     <!-- MCP区域 -->
@@ -161,9 +184,10 @@
       </div>
     </div>
 
-    <div class="drawer-footer">
-      <el-button @click="closeDialog">{{ $t('functionDialog.cancel') }}</el-button>
-      <el-button type="primary" @click="saveSelection">{{ $t('functionDialog.saveConfig') }}</el-button>
+      <div class="drawer-footer">
+        <el-button @click="closeDialog">{{ $t('functionDialog.cancel') }}</el-button>
+        <el-button type="primary" @click="saveSelection">{{ $t('functionDialog.saveConfig') }}</el-button>
+      </div>
     </div>
   </el-drawer>
 </template>
@@ -197,9 +221,9 @@ export default {
       dialogVisible: this.value,
       selectedNames: [],
       currentFunction: null,
+      editingParams: {},
       modifiedFunctions: {},
       tempFunctions: {},
-      // 添加一个标志位来跟踪是否已经保存
       hasSaved: false,
       loading: false,
 
@@ -207,7 +231,6 @@ export default {
       mcpStatus: "disconnected",
       mcpTools: [],
       
-      // 功能状态
       featureStatus: {
         mcpAccessPoint: false
       }
@@ -223,14 +246,44 @@ export default {
   },
   watch: {
     currentFunction(newFn) {
-      if (!newFn) return;
-      // 对每个字段，如果是 array 或 json，就在 textCache 里生成初始字符串
+      if (!newFn) {
+        this.editingParams = {};
+        return;
+      }
+      
+      // Initialize an empty object for Vue to track
+      const freshParams = {};
+      
       newFn.fieldsMeta.forEach(f => {
-        const v = newFn.params[f.key];
+        let v = newFn.params[f.key];
+        
+        // Backup from un-applied temp value
+        if (this.tempFunctions[newFn.name]?.[f.key] !== undefined) {
+          v = this.tempFunctions[newFn.name][f.key];
+        } else if (v === undefined && f.default !== undefined) {
+          v = f.default;
+        }
+        
+        // 自动类型转换修复
+        if (f.type === 'number') {
+          v = Number(v);
+          if (isNaN(v)) v = 0;
+        } else if (f.type === 'boolean' || f.type === 'bool') {
+          if (typeof v === 'string') {
+            v = v.toLowerCase() === 'true';
+          } else {
+            v = Boolean(v);
+          }
+        } else if (v === undefined) {
+          v = '';
+        }
+
+        // Set the property on our new tracking object BEFORE replacing editingParams
+        freshParams[f.key] = v;
+
         if (f.type === 'array') {
           this.$set(this.textCache, f.key, Array.isArray(v) ? v.join('\n') : '');
-        }
-        else if (f.type === 'json') {
+        } else if (f.type === 'json') {
           try {
             this.$set(this.textCache, f.key, JSON.stringify(v ?? {}, null, 2));
           } catch {
@@ -238,27 +291,28 @@ export default {
           }
         }
       });
+      
+      // Assign the fully populated object so Vue tracks all keys
+      this.editingParams = freshParams;
+      
+      // Initialize temp buffer
+      if (!this.tempFunctions[newFn.name]) {
+        this.tempFunctions[newFn.name] = { ...freshParams };
+      }
     },
     value(v) {
       this.dialogVisible = v;
       if (v) {
-        // 对话框打开时，初始化选中态
         this.selectedNames = this.functions.map(f => f.name);
-        // 把后端传来的 this.functions（带 params）merge 到 allFunctions 上
         this.functions.forEach(saved => {
           const idx = this.allFunctions.findIndex(f => f.name === saved.name);
           if (idx >= 0) {
-            // 保留用户之前在 saved.params 上的改动
             this.allFunctions[idx].params = { ...saved.params };
           }
         });
-        // 右侧默认指向第一个
         this.currentFunction = this.selectedList[0] || null;
 
-        // 加载功能状态
         this.loadFeatureStatus();
-        
-        // 加载MCP数据
         this.loadMcpAddress();
         this.loadMcpTools();
       }
@@ -268,11 +322,7 @@ export default {
     }
   },
   methods: {
-    /**
-     * 加载功能状态
-     */
     async loadFeatureStatus() {
-      // 确保featureManager已初始化完成
       await featureManager.waitForInitialization();
       
       const config = featureManager.getConfig();
@@ -284,7 +334,7 @@ export default {
     copyUrl() {
       const textarea = document.createElement('textarea');
       textarea.value = this.mcpUrl;
-      textarea.style.position = 'fixed';  // 防止页面滚动
+      textarea.style.position = 'fixed';
       document.body.appendChild(textarea);
       textarea.select();
 
@@ -308,7 +358,6 @@ export default {
       this.loadMcpTools();
     },
 
-    // 加载MCP接入点地址
     loadMcpAddress() {
       Api.agent.getAgentMcpAccessAddress(this.agentId, (res) => {
         if (res.data.code === 0) {
@@ -320,12 +369,10 @@ export default {
       });
     },
 
-    // 加载MCP工具列表
     loadMcpTools() {
       Api.agent.getAgentMcpToolsList(this.agentId, (res) => {
         if (res.data.code === 0) {
           this.mcpTools = res.data.data || [];
-          // 根据工具列表更新状态
           this.mcpStatus = this.mcpTools.length > 0 ? "connected" : "disconnected";
         } else {
           this.mcpTools = [];
@@ -341,7 +388,7 @@ export default {
         .split('\n')
         .map(s => s.trim())
         .filter(Boolean);
-      this.handleParamChange(this.currentFunction, key, arr);
+      this.handleParamInput(key, arr);
     },
 
     flushJson(field) {
@@ -352,22 +399,23 @@ export default {
       const text = this.textCache[key] || '';
       try {
         const obj = JSON.parse(text);
-        this.handleParamChange(this.currentFunction, key, obj);
+        this.handleParamInput(key, obj);
       } catch {
         this.$message.error(`${this.currentFunction.name}${this.$t('functionDialog.jsonFormatError')}`);
       }
     },
     handleFunctionClick(func) {
       if (this.selectedNames.includes(func.name)) {
-        const tempFunc = this.tempFunctions[func.name];
-        this.currentFunction = tempFunc ? tempFunc : func;
+        this.currentFunction = func;
       }
     },
-    handleParamChange(func, key, value) {
-      if (!this.tempFunctions[func.name]) {
-        this.tempFunctions[func.name] = JSON.parse(JSON.stringify(func));
+    handleParamInput(key, value) {
+      if (!this.currentFunction) return;
+      const funcName = this.currentFunction.name;
+      if (!this.tempFunctions[funcName]) {
+        this.tempFunctions[funcName] = { ...this.currentFunction.params };
       }
-      this.tempFunctions[func.name].params[key] = value;
+      this.tempFunctions[funcName][key] = value;
     },
     handleCheckboxChange(func, checked) {
       if (checked) {
@@ -388,7 +436,7 @@ export default {
     selectAll() {
       this.selectedNames = [...this.allFunctions.map(f => f.name)];
       if (this.selectedList.length > 0) {
-        this.currentFunction = JSON.parse(JSON.stringify(this.selectedList[0]));
+        this.currentFunction = this.selectedList[0];
       }
     },
 
@@ -408,7 +456,7 @@ export default {
 
     saveSelection() {
       Object.keys(this.tempFunctions).forEach(name => {
-        this.modifiedFunctions[name] = JSON.parse(JSON.stringify(this.tempFunctions[name]));
+        this.modifiedFunctions[name] = { ...this.tempFunctions[name] };
       });
       this.tempFunctions = {};
       this.hasSaved = true;
@@ -418,15 +466,12 @@ export default {
         return {
           id: f.id,
           name: f.name,
-          params: modified
-            ? { ...modified.params }
-            : { ...f.params }
+          params: modified ? { ...modified } : { ...f.params }
         }
       });
 
       this.$emit('update-functions', selected);
       this.dialogVisible = false;
-      // 通知父组件对话框已关闭且已保存
       this.$emit('dialog-closed', true);
     },
     fieldRemark(field) {
@@ -441,14 +486,21 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+.drawer-wrapper {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+}
+
 .function-manager {
-  display: grid;
-  grid-template-columns: max-content max-content 1fr;
-  gap: 12px;
-  height: calc(58vh);
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 10px 24px;
 }
 
 .custom-header {
+  flex-shrink: 0;
   position: relative;
   display: flex;
   justify-content: space-between;
@@ -475,25 +527,62 @@ export default {
   }
 }
 
-.function-column {
-  position: relative;
-  width: auto;
-  height:700px; 
-  padding: 10px;
-  overflow-y: auto;
-  border-right: 1px solid #EBEEF5;
-  scrollbar-width: none;
-  overflow-x: hidden;
+.responsive-row {
+  height: 100%;
+}
+
+.responsive-col {
+  height: 100%; /* Ensure columns respect the row height limit */
+  margin-bottom: 20px;
+}
+
+.box-card {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  border-radius: 8px;
+  background-color: #fafafa;
+  border: 1px solid #ebeef5;
+  transition: all 0.3s ease;
+
+  &:hover {
+    box-shadow: 0 4px 12px 0 rgba(0,0,0,0.05);
+  }
+
+  ::v-deep .el-card__header {
+    padding: 16px 20px;
+    border-bottom: 1px solid #ebeef5;
+    background-color: #ffffff;
+    border-top-left-radius: 8px;
+    border-top-right-radius: 8px;
+  }
+  
+  ::v-deep .el-card__body {
+    flex-grow: 1;
+    overflow-y: auto;
+    padding: 16px;
+  }
+}
+
+.custom-number-input {
+  width: 100%;
+  
+  input {
+    text-align: left;
+    height: 40px;
+    line-height: 40px;
+  }
+}
+
+.function-card, .params-card {
+  min-height: 400px;
 }
 
 .mcp-access-point {
-  position: relative;
-  z-index: 1;
+  flex-shrink: 0;
   background: white;
-}
-
-.function-column::-webkit-scrollbar {
-  display: none;
+  border-top: 1px solid #EBEEF5;
+  padding: 20px 24px;
 }
 
 .function-list {
@@ -519,27 +608,15 @@ export default {
   }
 }
 
-.params-column {
-  min-width: 280px;
-  padding: 10px;
-  overflow-y: auto;
-  scrollbar-width: none;
-}
-
-.params-column::-webkit-scrollbar {
-  display: none;
-}
-
 .column-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 12px;
 }
 
 .column-title {
-  text-align: center;
-  width: 100%;
+  font-weight: bold;
+  font-size: 16px;
 }
 
 .func-tag {
@@ -610,9 +687,7 @@ export default {
 }
 
 .params-container {
-  padding: 16px;
   border-radius: 4px;
-  min-width: 280px;
 }
 
 .empty-tip {
@@ -623,8 +698,7 @@ export default {
 
 
 .drawer-footer {
-  position: absolute;
-  bottom: 0;
+  flex-shrink: 0;
   width: 100%;
   border-top: 1px solid #e8e8e8;
   padding: 10px 16px;

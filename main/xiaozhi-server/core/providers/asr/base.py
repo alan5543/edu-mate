@@ -161,6 +161,8 @@ class ASRProviderBase(ABC):
             logger.bind(tag=TAG).info(
                 f"[PERF] ASR completed in {asr_duration:.3f}s | session={conn.session_id}"
             )
+            if hasattr(conn, "send_perf_metrics"):
+                conn.send_perf_metrics("ASR", asr_duration * 1000, "", content_for_length_check)
 
             # 性能监控
             total_time = time.monotonic() - total_start_time

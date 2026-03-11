@@ -1,10 +1,11 @@
 // 主应用入口
-import { checkOpusLoaded, initOpusEncoder } from './core/audio/opus-codec.js?v=0212-4';
-import { getAudioPlayer } from './core/audio/player.js?v=0212-4';
-import { checkMicrophoneAvailability, isHttpNonLocalhost } from './core/audio/recorder.js?v=0212-4';
-import { initMcpTools } from './core/mcp/tools.js?v=0212-4';
-import { uiController } from './ui/controller.js?v=0212-4';
-import { log } from './utils/logger.js?v=0212-4';
+import { checkOpusLoaded, initOpusEncoder } from './core/audio/opus-codec.js?v=0310-1';
+import { getAudioPlayer } from './core/audio/player.js?v=0310-1';
+import { checkMicrophoneAvailability, isHttpNonLocalhost } from './core/audio/recorder.js?v=0310-1';
+import { initMcpTools, getMcpTools } from './core/mcp/tools.js?v=0310-1';
+import { initToolTracker, renderDeviceMcpTools } from './core/tools/tool-list.js?v=0310-2';
+import { uiController } from './ui/controller.js?v=0310-1';
+import { log } from './utils/logger.js?v=0310-1';
 
 // 应用类
 class App {
@@ -28,7 +29,16 @@ class App {
         this.audioPlayer = getAudioPlayer();
         await this.audioPlayer.start();
         // 初始化MCP工具
-        initMcpTools();
+        await initMcpTools();
+        // 初始化工具跟踪面板
+        initToolTracker();
+        // 渲染设备MCP工具到面板
+        const deviceTools = getMcpTools();
+        renderDeviceMcpTools(deviceTools.map(t => ({
+            name: t.name,
+            description: t.description,
+            inputSchema: t.inputSchema,
+        })));
         // 检查麦克风可用性
         await this.checkMicrophoneAvailability();
         // 初始化Live2D

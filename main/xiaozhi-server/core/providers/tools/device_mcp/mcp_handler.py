@@ -210,6 +210,7 @@ async def handle_mcp_message(conn, mcp_client: MCPClient, payload: dict):
                     if hasattr(conn, "func_handler") and conn.func_handler:
                         conn.func_handler.tool_manager.refresh_tools()
                         conn.func_handler.current_support_functions()
+                        await conn.func_handler.send_tool_list()
             return
 
     # Handle method calls (requests from the client)

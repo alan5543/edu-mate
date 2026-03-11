@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>小智服务器测试页面</title>
-    <link rel="stylesheet" href="css/test_page.css?v=0212-4">
+    <link rel="stylesheet" href="css/test_page.css?v=0310-1">
     <script>
         // 检测是否使用file://协议打开
         if (window.location.protocol === 'file:') {
@@ -34,6 +34,9 @@
             });
         }
     </script>
+    <style>
+        /* Additional debug panel overrides moved to test_page.css */
+    </style>
 </head>
 
 <body>
@@ -77,6 +80,78 @@
             </div>
         </div>
 
+        <!-- 固定浮动的工具调试面板 -->
+        <div class="debug-panel" id="debugPanel">
+            <div class="debug-panel-header" id="debugPanelToggle">
+                <span class="debug-panel-title">🛠️ Tool Tracker</span>
+                <span class="debug-panel-badge" id="debugToolCount">0</span>
+                <span class="debug-panel-arrow" id="debugPanelArrow">▼</span>
+            </div>
+            <div class="debug-panel-content" id="debugPanelContent">
+                <!-- Section 1: Server Tools -->
+                <div class="debug-section">
+                    <div class="debug-section-header" data-section="serverTools">
+                        <span class="debug-section-icon">🖥️</span>
+                        <span class="debug-section-title">Server Tools</span>
+                        <span class="debug-section-badge" id="serverToolsBadge">0</span>
+                        <span class="debug-section-status" id="serverToolsStatus">offline</span>
+                        <span class="debug-section-arrow">▾</span>
+                    </div>
+                    <div class="debug-section-body" id="serverToolsSection">
+                        <div class="server-tools-list" id="serverToolsContainer">
+                            <div class="tool-list-empty">Waiting for connection...</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Section 2: Device MCP Tools -->
+                <div class="debug-section">
+                    <div class="debug-section-header" data-section="deviceMcp">
+                        <span class="debug-section-icon">📱</span>
+                        <span class="debug-section-title">Device MCP</span>
+                        <span class="debug-section-badge" id="deviceMcpBadge">0</span>
+                        <span class="debug-section-status" id="deviceMcpStatus">loaded</span>
+                        <span class="debug-section-arrow">▾</span>
+                    </div>
+                    <div class="debug-section-body" id="deviceMcpSection">
+                        <div class="device-mcp-list" id="deviceMcpContainer">
+                            <div class="tool-list-empty">Loading device tools...</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Section 3: Tool Call Activity -->
+                <div class="debug-section">
+                    <div class="debug-section-header" data-section="toolActivity">
+                        <span class="debug-section-icon">🔌</span>
+                        <span class="debug-section-title">Tool Activity</span>
+                        <span class="debug-section-badge activity-badge" id="activityBadge">0</span>
+                        <span class="debug-section-arrow">▾</span>
+                    </div>
+                    <div class="debug-section-body" id="toolActivitySection">
+                        <div class="tool-call-log" id="toolCallLog">
+                            <div class="tool-list-empty">No calls yet</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Section 4: System Tracking -->
+                <div class="debug-section">
+                    <div class="debug-section-header" data-section="sysPerf">
+                        <span class="debug-section-icon">⚡</span>
+                        <span class="debug-section-title">System Tracking</span>
+                        <span class="debug-section-badge sysperf-badge" id="sysPerfBadge">0</span>
+                        <span class="debug-section-arrow">▾</span>
+                    </div>
+                    <div class="debug-section-body" id="sysPerfSection">
+                        <div class="tool-call-log" id="sysPerfLog">
+                            <div class="tool-list-empty">No tracking yet</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <!-- 底部控制栏 -->
         <div class="control-bar">
             <button class="control-btn" id="settingsBtn" title="设置">
@@ -85,6 +160,14 @@
                         d="M12 15.5A3.5 3.5 0 0 1 8.5 12A3.5 3.5 0 0 1 12 8.5A3.5 3.5 0 0 1 15.5 12A3.5 3.5 0 0 1 12 15.5M19.43 12.97C19.47 12.65 19.5 12.33 19.5 12C19.5 11.67 19.47 11.34 19.43 11L21.54 9.37C21.73 9.22 21.78 8.95 21.66 8.73L19.66 5.27C19.54 5.05 19.27 4.96 19.05 5.05L16.56 6.05C16.04 5.66 15.5 5.32 14.87 5.07L14.5 2.42C14.46 2.18 14.25 2 14 2H10C9.75 2 9.54 2.18 9.5 2.42L9.13 5.07C8.5 5.32 7.96 5.66 7.44 6.05L4.95 5.05C4.73 4.96 4.46 5.05 4.34 5.27L2.34 8.73C2.22 8.95 2.27 9.22 2.46 9.37L4.57 11C4.53 11.34 4.5 11.67 4.5 12C4.5 12.33 4.53 12.65 4.57 12.97L2.46 14.63C2.27 14.78 2.22 15.05 2.34 15.27L4.34 18.73C4.46 18.95 4.73 19.03 4.95 18.95L7.44 17.94C7.96 18.34 8.5 18.68 9.13 18.93L9.5 21.58C9.54 21.82 9.75 22 10 22H14C14.25 22 14.46 21.82 14.5 21.58L14.87 18.93C15.5 18.68 16.04 18.34 16.56 17.94L19.05 18.95C19.27 19.03 19.54 18.95 19.66 18.73L21.66 15.27C21.78 15.05 21.73 14.78 21.54 14.63L19.43 12.97Z" />
                 </svg>
                 <span class="btn-text">设置</span>
+            </button>
+
+            <button class="control-btn" id="cameraBtn" title="拍照/视觉">
+                <svg class="btn-icon" viewBox="0 0 24 24" fill="currentColor">
+                    <path
+                        d="M4,4H7L9,2H15L17,4H20A2,2 0 0,1 22,6V18A2,2 0 0,1 20,20H4A2,2 0 0,1 2,18V6A2,2 0 0,1 4,4M12,7A5,5 0 0,0 7,12A5,5 0 0,0 12,17A5,5 0 0,0 17,12A5,5 0 0,0 12,7M12,9A3,3 0 0,1 15,12A3,3 0 0,1 12,15A3,3 0 0,1 9,12A3,3 0 0,1 12,9Z" />
+                </svg>
+                <span class="btn-text">相机</span>
             </button>
 
             <button class="control-btn" id="backgroundBtn" title="切换背景">
@@ -118,6 +201,33 @@
                 </svg>
                 <span class="btn-text">录音</span>
             </button>
+        </div>
+    </div>
+
+    <!-- 模拟相机弹窗 -->
+    <div class="modal" id="cameraModal">
+        <div class="modal-content camera-modal">
+            <div class="modal-header">
+                <h2>模拟相机 - 上传照片</h2>
+                <button class="close-btn" id="closeCameraBtn">&times;</button>
+            </div>
+            <div class="modal-body" style="text-align: center;">
+                <p style="margin-bottom: 20px; color: #666; font-size: 14px;">Xiaozhi 请求设备拍照。请选择一张图片模拟摄像头画面：</p>
+                <input type="file" id="cameraFileInput" accept="image/*" style="display: none;">
+                <div id="cameraPreviewContainer"
+                    style="margin: 20px auto; max-width: 100%; min-height: 150px; border: 2px dashed #ccc; border-radius: 8px; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: border-color 0.3s; position: relative; overflow: hidden;">
+                    <span id="cameraPreviewText" style="color: #999;">点击选择图片</span>
+                    <img id="cameraPreviewImg" src=""
+                        style="max-width: 100%; max-height: 300px; display: none; border-radius: 6px;">
+                </div>
+                <div style="margin-top: 20px; display: flex; gap: 10px; justify-content: center;">
+                    <button id="cancelCameraBtn" class="btn-secondary" style="padding: 10px 20px;">取消</button>
+                    <button id="submitCameraBtn" class="btn-primary" style="padding: 10px 20px;"
+                        disabled>模拟上传照片</button>
+                </div>
+                <div id="cameraStatusText" style="margin-top: 15px; font-size: 12px; color: #57f287; display: none;">✅
+                    照片已准备发送给视觉 API...</div>
+            </div>
         </div>
     </div>
 
@@ -172,6 +282,8 @@
                         </div>
                     </div>
                 </div>
+
+
 
                 <div class="tab-content" id="mcpTab">
                     <!-- MCP 工具管理区域 -->
@@ -246,23 +358,23 @@
     </div>
 
     <!-- 背景加载 -->
-    <script src="js/ui/background-load.js?v=0212-4"></script>
+    <script src="js/ui/background-load.js?v=0310-1"></script>
 
     <!-- PIXI.js 2D渲染引擎 -->
-    <script src="js/live2d/pixi.js?v=0212-4"></script>
+    <script src="js/live2d/pixi.js?v=0310-1"></script>
 
     <!-- Live2D Cubism 4.0 SDK -->
-    <script src="js/live2d/live2dcubismcore.min.js?v=0212-4"></script>
-    <script src="js/live2d/cubism4.min.js?v=0212-4"></script>
+    <script src="js/live2d/live2dcubismcore.min.js?v=0310-1"></script>
+    <script src="js/live2d/cubism4.min.js?v=0310-1"></script>
 
     <!-- Live2D 管理器 -->
-    <script src="js/live2d/live2d.js?v=0212-4"></script>
+    <script src="js/live2d/live2d.js?v=0310-1"></script>
 
     <!-- Opus解码库 -->
-    <script src="js/utils/libopus.js?v=0212-4"></script>
+    <script src="js/utils/libopus.js?v=0310-1"></script>
 
     <!-- 主应用入口 -->
-    <script type="module" src="js/app.js?v=0212-4"></script>
+    <script type="module" src="js/app.js?v=0310-1"></script>
 
     <!-- 全局错误处理 -->
     <script>

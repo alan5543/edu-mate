@@ -50,8 +50,8 @@ class ServerPluginExecutor(ToolExecutor):
         """获取所有注册的服务端插件工具"""
         tools = {}
 
-        # 获取必要的函数
-        necessary_functions = ["handle_exit_intent", "get_lunar"]
+        # 注释掉强制获取的必要函数，让用户可以在控制台自由配置
+        necessary_functions = []
 
         # 获取配置中的函数
         config_functions = self.config["Intent"][

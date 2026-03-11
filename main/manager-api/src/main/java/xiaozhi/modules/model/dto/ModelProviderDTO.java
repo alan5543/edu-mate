@@ -32,6 +32,9 @@ public class ModelProviderDTO implements Serializable {
     @NotBlank(message = "name不能为空")
     private String name;
 
+    @Schema(description = "功能描述")
+    private String description;
+
     @Schema(description = "供应器字段列表(JSON格式)")
     @TableField(typeHandler = JacksonTypeHandler.class)
     @NotBlank(message = "fields(JSON格式)不能为空")

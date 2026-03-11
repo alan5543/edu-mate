@@ -101,6 +101,8 @@ class TTSProviderBase(ABC):
                         logger.bind(tag=TAG).info(
                             f"[PERF] TTS segment completed in {tts_duration:.3f}s | text_len={text_len}"
                         )
+                        if hasattr(self.conn, "send_perf_metrics"):
+                            self.conn.send_perf_metrics("TTS", tts_duration * 1000, f"Chars: {text_len}", text)
                         self.tts_audio_queue.put((SentenceType.FIRST, None, text))
                         audio_bytes_to_data_stream(
                             audio_bytes,
@@ -148,6 +150,8 @@ class TTSProviderBase(ABC):
                     logger.bind(tag=TAG).info(
                         f"[PERF] TTS segment completed in {tts_duration:.3f}s | text_len={text_len}"
                     )
+                    if hasattr(self.conn, "send_perf_metrics"):
+                        self.conn.send_perf_metrics("TTS", tts_duration * 1000, f"Chars: {text_len}", text)
                     logger.bind(tag=TAG).info(
                         f"语音生成成功: {text}:{tmp_file}，重试{5 - max_repeat_time}次"
                     )

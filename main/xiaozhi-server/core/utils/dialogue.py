@@ -65,6 +65,9 @@ class Dialogue:
         # 构建对话
         dialogue = []
 
+        # [PERF] Cap dialogue history to prevent LLM slowdowns from growing context
+        MAX_DIALOGUE_MESSAGES = 20  # Max user/assistant messages to include
+
         # 添加系统提示和记忆
         system_message = next(
             (msg for msg in self.dialogue if msg.role == "system"), None
@@ -110,9 +113,11 @@ class Dialogue:
                 )
             dialogue.append({"role": "system", "content": enhanced_system_prompt})
 
-        # 添加用户和助手的对话
-        for m in self.dialogue:
-            if m.role != "system":  # 跳过原始的系统消息
-                self.getMessages(m, dialogue)
+        # 添加用户和助手的对话 (capped to last N messages)
+        non_system = [m for m in self.dialogue if m.role != "system"]
+        if len(non_system) > MAX_DIALOGUE_MESSAGES:
+            non_system = non_system[-MAX_DIALOGUE_MESSAGES:]
+        for m in non_system:
+            self.getMessages(m, dialogue)
 
         return dialogue

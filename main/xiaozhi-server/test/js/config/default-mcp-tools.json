@@ -68,5 +68,17 @@
             "brightness": "${brightness}",
             "message": "亮度已设置为 ${brightness}"
         }
+    },
+    {
+        "name": "self.camera.take_picture",
+        "description": "Capture an image using the device's camera. Use this tool when the user asks you to look at something, see what is in front of you, or take a picture.",
+        "inputSchema": {
+            "type": "object",
+            "properties": {}
+        },
+        "mockResponse": {
+            "success": true,
+            "message": "照片已拍摄"
+        }
     }
 ]

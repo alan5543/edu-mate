@@ -1,11 +1,12 @@
 // WebSocket消息处理模块
-import { getConfig, saveConnectionUrls } from '../../config/manager.js?v=0212-4';
-import { uiController } from '../../ui/controller.js?v=0212-4';
-import { log } from '../../utils/logger.js?v=0212-4';
-import { getAudioPlayer } from '../audio/player.js?v=0212-4';
-import { getAudioRecorder } from '../audio/recorder.js?v=0212-4';
-import { executeMcpTool, getMcpTools, setWebSocket as setMcpWebSocket } from '../mcp/tools.js?v=0212-4';
-import { webSocketConnect } from './ota-connector.js?v=0212-4';
+import { getConfig, saveConnectionUrls } from '../../config/manager.js?v=0310-1';
+import { uiController } from '../../ui/controller.js?v=0310-1';
+import { log } from '../../utils/logger.js?v=0310-1';
+import { getAudioPlayer } from '../audio/player.js?v=0310-1';
+import { getAudioRecorder } from '../audio/recorder.js?v=0310-1';
+import { executeMcpTool, getMcpTools, setWebSocket as setMcpWebSocket } from '../mcp/tools.js?v=0310-1';
+import { renderToolList, addToolCallEvent, clearToolList, markToolCalling, markToolIdle, renderDeviceMcpTools, initToolTracker } from '../tools/tool-list.js?v=0310-2';
+import { webSocketConnect } from './ota-connector.js?v=0310-1';
 
 // WebSocket处理器类
 export class WebSocketHandler {
@@ -18,6 +19,7 @@ export class WebSocketHandler {
         this.onChatMessage = null; // 新增：聊天消息回调
         this.currentSessionId = null;
         this.isRemoteSpeaking = false;
+        this.visionConfig = null; // Store vision API config from MCP initialize
     }
 
     // 发送hello握手消息
@@ -115,6 +117,14 @@ export class WebSocketHandler {
             }
         } else if (message.type === 'mcp') {
             this.handleMCPMessage(message);
+        } else if (message.type === 'tool_list') {
+            // 服务端工具列表
+            log(`收到服务端工具列表: ${(message.tools || []).length} 个工具`, 'info');
+            renderToolList(message.tools || []);
+        } else if (message.type === 'tool_call') {
+            // 服务端工具调用事件
+            log(`收到工具调用事件: ${message.name}`, 'info');
+            addToolCallEvent(message);
         } else {
             log(`未知消息类型: ${message.type}`, 'info');
             if (this.onChatMessage) {
@@ -249,7 +259,28 @@ export class WebSocketHandler {
 
             log(`调用工具: ${toolName} 参数: ${JSON.stringify(toolArgs)}`, 'info');
 
+            // Mark tool as calling in the tracker
+            markToolCalling(toolName);
+
+            // INTERCEPT CAMERA TOOL CALL
+            if (toolName === 'self.camera.take_picture') {
+                log('====== 请求打开摄像头，进入相机模拟模式 ======', 'info');
+                this.handleCameraSimulation(message, payload, toolName);
+                return; // Stop normal execution
+            }
+
             const result = executeMcpTool(toolName, toolArgs);
+
+            // Track this device MCP tool call in the activity feed
+            addToolCallEvent({
+                name: toolName,
+                arguments: toolArgs,
+                result_action: 'RESPONSE',
+                result_summary: JSON.stringify(result).substring(0, 200),
+            });
+
+            // Mark tool as idle
+            markToolIdle(toolName);
 
             const replyMessage = JSON.stringify({
                 "session_id": message.session_id || "",
@@ -273,6 +304,13 @@ export class WebSocketHandler {
             this.websocket.send(replyMessage);
         } else if (payload.method === 'initialize') {
             log(`收到工具初始化请求: ${JSON.stringify(payload.params)}`, 'info');
+
+            // Extract vision capabilities from MCP server if provided
+            if (payload.params?.capabilities?.vision) {
+                this.visionConfig = payload.params.capabilities.vision;
+                log(`保存视觉API配置: URL=${this.visionConfig.url}`, 'info');
+            }
+
             const replyMessage = JSON.stringify({
                 "session_id": message.session_id || "",
                 "type": "mcp",
@@ -298,6 +336,212 @@ export class WebSocketHandler {
         }
     }
 
+    // 模拟相机拍照和上传
+    handleCameraSimulation(message, payload, toolName) {
+        const modal = document.getElementById('cameraModal');
+        const fileInput = document.getElementById('cameraFileInput');
+        const textDisplay = document.getElementById('cameraPreviewText');
+        const imgPreview = document.getElementById('cameraPreviewImg');
+        const cancelBtn = document.getElementById('cancelCameraBtn');
+        const submitBtn = document.getElementById('submitCameraBtn');
+        const statusText = document.getElementById('cameraStatusText');
+        const previewBg = document.getElementById('cameraPreviewContainer');
+
+        if (!modal) {
+            log('未找到相机模拟弹窗，无法执行', 'error');
+            this.sendMcpError(message.session_id, payload.id, "Device camera UI not available");
+            return;
+        }
+
+        // Reset UI
+        modal.style.display = 'block';
+        textDisplay.style.display = 'block';
+        imgPreview.style.display = 'none';
+        imgPreview.src = '';
+        fileInput.value = '';
+        statusText.style.display = 'none';
+        statusText.textContent = '';
+        submitBtn.disabled = true;
+
+        let selectedFile = null;
+
+        // Cleanup function for listeners
+        const cleanup = () => {
+            modal.style.display = 'none';
+            markToolIdle(toolName);
+            cancelBtn.onclick = null;
+            submitBtn.onclick = null;
+            previewBg.onclick = null;
+            fileInput.onchange = null;
+        };
+
+        // Handlers
+        cancelBtn.onclick = () => {
+            log('用户取消了拍照', 'warning');
+            this.sendMcpError(message.session_id, payload.id, "User cancelled camera capture");
+            cleanup();
+        };
+
+        previewBg.onclick = () => {
+            fileInput.click();
+        };
+
+        fileInput.onchange = (e) => {
+            if (e.target.files && e.target.files[0]) {
+                selectedFile = e.target.files[0];
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    imgPreview.src = e.target.result;
+                    imgPreview.style.display = 'block';
+                    textDisplay.style.display = 'none';
+                    submitBtn.disabled = false;
+                };
+                reader.readAsDataURL(selectedFile);
+            }
+        };
+
+        submitBtn.onclick = async () => {
+            if (!selectedFile) return;
+            submitBtn.disabled = true;
+            statusText.style.display = 'block';
+            statusText.style.color = '#fee75c';
+            statusText.textContent = '🔄 正在上传并在后端进行视觉分析...';
+
+            log('开始发送图片到 /v1/vision 接口...', 'info');
+
+            try {
+                // Get config and url
+                const config = getConfig();
+                const deviceId = config.deviceId;
+
+                let visionUrl, token;
+                if (this.visionConfig && this.visionConfig.url && this.visionConfig.token) {
+                    visionUrl = this.visionConfig.url;
+                    token = this.visionConfig.token;
+                    log('使用服务器下发的 Vision API 配置', 'info');
+                } else {
+                    token = config.token;
+                    const otaUrlObj = new URL(document.getElementById('otaUrl').value);
+                    // Extract host and port
+                    const httpProtocol = otaUrlObj.protocol === 'wss:' ? 'https:' : 'http:';
+                    // The vision API runs on port 8003
+                    let host = otaUrlObj.host;
+                    if (host.includes(':')) {
+                        host = host.split(':')[0] + ':8003';
+                    }
+                    const hostUrl = `${httpProtocol}//${host}`;
+                    visionUrl = `${hostUrl}/mcp/vision/explain`;
+                    log('向 Vision API 发送数据，使用本地推导配置', 'info');
+                }
+
+                // We need the last user chat message to send as the question
+                let lastQuestion = "请描述这张图片中有什么。";
+                const chatStream = document.getElementById('chatStream');
+                if (chatStream) {
+                    const messages = Array.from(chatStream.querySelectorAll('.chat-message.user .message-bubble'));
+                    // Find the last user message
+                    if (messages.length > 0) {
+                        lastQuestion = messages[messages.length - 1].textContent.trim();
+                    }
+                }
+
+                const formData = new FormData();
+                // IMPORTANT: The backend expects 'question' first, then 'image' in sequential multipart
+                formData.append('question', lastQuestion);
+                formData.append('image', selectedFile);
+
+                const response = await fetch(visionUrl, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Device-Id': deviceId,
+                        'Client-Id': config.clientId
+                    },
+                    body: formData
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                const data = await response.json();
+                statusText.style.color = '#57f287';
+                statusText.textContent = '✅ 视觉分析完成! 通知大模型...';
+                log(`视觉分析响应: ${JSON.stringify(data)}`, 'success');
+
+                // Track the successful tool call summary
+                const mockSummary = `[照片已拍] 分析结果: ${data.response?.substring(0, 100)}...`;
+                addToolCallEvent({
+                    name: toolName,
+                    arguments: {},
+                    result_action: 'RESPONSE',
+                    result_summary: mockSummary,
+                });
+
+                // Reply to the MCP server with the actual data from the backend
+                const replyMessage = JSON.stringify({
+                    "session_id": message.session_id || "",
+                    "type": "mcp",
+                    "payload": {
+                        "jsonrpc": "2.0",
+                        "id": payload.id,
+                        "result": {
+                            "content": [
+                                {
+                                    "type": "text",
+                                    "text": JSON.stringify({
+                                        success: data.success ?? true,
+                                        message: data.message || (data.success ? "照片已拍摄，视觉分析结果已生成" : "视觉分析失败"),
+                                        vision_analysis: data.response || null
+                                    })
+                                }
+                            ],
+                            "isError": !data.success
+                        }
+                    }
+                });
+
+                this.websocket.send(replyMessage);
+
+                setTimeout(() => {
+                    cleanup();
+                }, 1500);
+
+            } catch (error) {
+                log(`视觉API上传失败: ${error.message} `, 'error');
+                statusText.style.color = '#ed4245';
+                statusText.textContent = `❌ 上传出错: ${error.message} `;
+                submitBtn.disabled = false;
+
+                // After 3 seconds, abort and cleanup
+                setTimeout(() => {
+                    this.sendMcpError(message.session_id, payload.id, `Upload failed: ${error.message} `);
+                    cleanup();
+                }, 3000);
+            }
+        };
+    }
+
+    // 发送MCP错误响应
+    sendMcpError(sessionId, messageId, errorMessage) {
+        if (!this.websocket || this.websocket.readyState !== WebSocket.OPEN) return;
+
+        const replyMessage = JSON.stringify({
+            "session_id": sessionId || "",
+            "type": "mcp",
+            "payload": {
+                "jsonrpc": "2.0",
+                "id": messageId,
+                "error": {
+                    "code": -32603,
+                    "message": errorMessage
+                }
+            }
+        });
+        log(`发送MCP错误响应: ${errorMessage} `, 'warning');
+        this.websocket.send(replyMessage);
+    }
+
     // 处理二进制消息
     async handleBinaryMessage(data) {
         try {
@@ -306,9 +550,9 @@ export class WebSocketHandler {
                 arrayBuffer = data;
             } else if (data instanceof Blob) {
                 arrayBuffer = await data.arrayBuffer();
-                log(`收到Blob音频数据，大小: ${arrayBuffer.byteLength}字节`, 'debug');
+                log(`收到Blob音频数据，大小: ${arrayBuffer.byteLength} 字节`, 'debug');
             } else {
-                log(`收到未知类型的二进制数据: ${typeof data}`, 'warning');
+                log(`收到未知类型的二进制数据: ${typeof data} `, 'warning');
                 return;
             }
 
@@ -316,7 +560,7 @@ export class WebSocketHandler {
             const audioPlayer = getAudioPlayer();
             audioPlayer.enqueueAudioData(opusData);
         } catch (error) {
-            log(`处理二进制消息出错: ${error.message}`, 'error');
+            log(`处理二进制消息出错: ${error.message} `, 'error');
         }
     }
 
@@ -348,7 +592,7 @@ export class WebSocketHandler {
 
             return true;
         } catch (error) {
-            log(`连接错误: ${error.message}`, 'error');
+            log(`连接错误: ${error.message} `, 'error');
             if (this.onConnectionStateChange) {
                 this.onConnectionStateChange(false);
             }
@@ -360,7 +604,7 @@ export class WebSocketHandler {
     setupEventHandlers() {
         this.websocket.onopen = async () => {
             const url = document.getElementById('serverUrl').value;
-            log(`已连接到服务器: ${url}`, 'success');
+            log(`已连接到服务器: ${url} `, 'success');
 
             if (this.onConnectionStateChange) {
                 this.onConnectionStateChange(true);
@@ -371,6 +615,17 @@ export class WebSocketHandler {
             if (this.onSessionStateChange) {
                 this.onSessionStateChange(false);
             }
+
+            // Initialize the tool tracker panel toggles
+            initToolTracker();
+
+            // Render device MCP tools in the tracker
+            const deviceTools = getMcpTools();
+            renderDeviceMcpTools(deviceTools.map(t => ({
+                name: t.name,
+                description: t.description,
+                inputSchema: t.inputSchema,
+            })));
 
             // 在WebSocket连接成功时初始化Live2D音频分析器
             this.initializeLive2DAudioAnalyzer();
@@ -385,13 +640,16 @@ export class WebSocketHandler {
                 this.onConnectionStateChange(false);
             }
 
+            // 清除工具列表
+            clearToolList();
+
             const audioRecorder = getAudioRecorder();
             audioRecorder.stop();
         };
 
         this.websocket.onerror = (error) => {
-            log(`WebSocket错误: ${error.message || '未知错误'}`, 'error');
-            uiController.addChatMessage(`⚠️ WebSocket错误: ${error.message || '未知错误'}`, false);
+            log(`WebSocket错误: ${error.message || '未知错误'} `, 'error');
+            uiController.addChatMessage(`⚠️ WebSocket错误: ${error.message || '未知错误'} `, false);
             if (this.onConnectionStateChange) {
                 this.onConnectionStateChange(false);
             }
@@ -406,7 +664,7 @@ export class WebSocketHandler {
                     this.handleBinaryMessage(event.data);
                 }
             } catch (error) {
-                log(`WebSocket消息处理错误: ${error.message}`, 'error');
+                log(`WebSocket消息处理错误: ${error.message} `, 'error');
                 // 不再使用旧的addMessage函数，因为conversationDiv元素不存在
                 // 错误消息将通过其他方式显示
             }
@@ -447,11 +705,11 @@ export class WebSocketHandler {
             };
 
             this.websocket.send(JSON.stringify(listenMessage));
-            log(`发送文本消息: ${text}`, 'info');
+            log(`发送文本消息: ${text} `, 'info');
 
             return true;
         } catch (error) {
-            log(`发送消息错误: ${error.message}`, 'error');
+            log(`发送消息错误: ${error.message} `, 'error');
             return false;
         }
     }
@@ -465,12 +723,12 @@ export class WebSocketHandler {
             const live2dManager = window.chatApp?.live2dManager;
             if (live2dManager && typeof live2dManager.triggerEmotionAction === 'function') {
                 live2dManager.triggerEmotionAction(emotion);
-                log(`触发Live2D情绪动作: ${emotion}`, 'info');
+                log(`触发Live2D情绪动作: ${emotion} `, 'info');
             } else {
                 log(`无法触发Live2D情绪动作: Live2D管理器未找到或方法不可用`, 'warning');
             }
         } catch (error) {
-            log(`触发Live2D情绪动作失败: ${error.message}`, 'error');
+            log(`触发Live2D情绪动作失败: ${error.message} `, 'error');
         }
     }
 

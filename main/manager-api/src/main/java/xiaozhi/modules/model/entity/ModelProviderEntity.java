@@ -27,6 +27,9 @@ public class ModelProviderEntity {
     @Schema(description = "供应器名称")
     private String name;
 
+    @Schema(description = "供应器描述")
+    private String description;
+
     @Schema(description = "供应器字段列表(JSON格式)")
     private String fields;
 

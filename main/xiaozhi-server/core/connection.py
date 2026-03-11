@@ -794,6 +794,36 @@ class ConnectionHandler:
         # 更新系统prompt至上下文
         self.dialogue.update_system_message(self.prompt)
 
+    def send_perf_metrics(self, component_name, duration_ms, details="", content=""):
+        """发送性能指标到前端 (通过 tool_call 事件模拟)"""
+        try:
+            if not self.websocket or getattr(self.websocket, "closed", False):
+                return
+            
+            perf_msg = {
+                "type": "tool_call",
+                "name": f"sys_perf_{component_name}",
+                "arguments": {
+                    "duration_ms": round(duration_ms, 2),
+                    "details": details,
+                    "content": content
+                },
+                "result_action": "RESPONSE",
+                "result_summary": f"Duration: {round(duration_ms, 2)}ms" + (f" | {details}" if details else ""),
+                "session_id": self.session_id
+            }
+            
+            if hasattr(self, "loop") and self.loop and self.loop.is_running():
+                async def _send():
+                    try:
+                        await self.websocket.send(json.dumps(perf_msg))
+                    except Exception as e:
+                        pass
+                asyncio.run_coroutine_threadsafe(_send(), self.loop)
+        except Exception as e:
+            pass
+
+
     def chat(self, query, depth=0):
         if query is not None:
             self.logger.bind(tag=TAG).info(f"大模型收到用户消息: {query}")
@@ -915,6 +945,7 @@ class ConnectionHandler:
                         self.logger.bind(tag=TAG).info(
                             f"[PERF] LLM first token in {llm_first_token_time - llm_start_time:.3f}s | session={self.session_id}"
                         )
+                        self.send_perf_metrics("LLM First Token", (llm_first_token_time - llm_start_time) * 1000, "", content)
                     llm_total_chars += len(content)
                     if not tool_call_flag:
                         response_message.append(content)
@@ -951,6 +982,7 @@ class ConnectionHandler:
         self.logger.bind(tag=TAG).info(
             f"[PERF] LLM completed in {llm_end_time - llm_start_time:.3f}s | total_chars={llm_total_chars} | session={self.session_id}"
         )
+        self.send_perf_metrics("LLM Complete", (llm_end_time - llm_start_time) * 1000, f"Chars: {llm_total_chars}", "".join(response_message))
         
         # 处理function call
         if tool_call_flag:
@@ -993,6 +1025,36 @@ class ConnectionHandler:
                 self.logger.bind(tag=TAG).debug(
                     f"检测到 {len(tool_calls_list)} 个工具调用"
                 )
+
+                # [PERF] Send interim "searching" voice message to fill silence
+                # This lets the user know we're working on their request
+                try:
+                    tool_names = [tc["name"] for tc in tool_calls_list]
+                    if any("wikipedia" in n.lower() for n in tool_names):
+                        interim_text = "让我查查百科~"
+                    elif any("search" in n.lower() or "tavily" in n.lower() for n in tool_names):
+                        interim_text = "让我搜一下哦~"
+                    elif any("fetch_url" in n.lower() for n in tool_names):
+                        interim_text = "让我看看这个链接~"
+                    elif any("weather" in n.lower() for n in tool_names):
+                        interim_text = "看看天气~"
+                    elif any("news" in n.lower() for n in tool_names):
+                        interim_text = "让我看看最新消息~"
+                    else:
+                        interim_text = "让我查一下~"
+                    self.tts.tts_text_queue.put(
+                        TTSMessageDTO(
+                            sentence_id=self.sentence_id,
+                            sentence_type=SentenceType.MIDDLE,
+                            content_type=ContentType.TEXT,
+                            content_detail=interim_text,
+                        )
+                    )
+                    self.logger.bind(tag=TAG).info(
+                        f"[PERF] Sent interim message: {interim_text}"
+                    )
+                except Exception as e:
+                    self.logger.bind(tag=TAG).debug(f"Interim message failed: {e}")
 
                 # 收集所有工具调用的 Future
                 futures_with_data = []

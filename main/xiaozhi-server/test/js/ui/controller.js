@@ -1,8 +1,8 @@
 // UI controller module
-import { loadConfig, saveConfig } from '../config/manager.js?v=0212-4';
-import { getAudioPlayer } from '../core/audio/player.js?v=0212-4';
-import { getAudioRecorder } from '../core/audio/recorder.js?v=0212-4';
-import { getWebSocketHandler } from '../core/network/websocket.js?v=0212-4';
+import { loadConfig, saveConfig } from '../config/manager.js?v=0310-1';
+import { getAudioPlayer } from '../core/audio/player.js?v=0310-1';
+import { getAudioRecorder } from '../core/audio/recorder.js?v=0310-1';
+import { getWebSocketHandler } from '../core/network/websocket.js?v=0310-1';
 
 // UI controller class
 class UIController {
@@ -80,6 +80,25 @@ class UIController {
         const backgroundBtn = document.getElementById('backgroundBtn');
         if (backgroundBtn) {
             backgroundBtn.addEventListener('click', this.switchBackground);
+        }
+
+        // Camera manual trigger button
+        const cameraBtn = document.getElementById('cameraBtn');
+        if (cameraBtn) {
+            cameraBtn.addEventListener('click', () => {
+                this.showModal('cameraModal');
+                // Auto trigger the take_picture mock logic for manual UI
+                const wsHandler = getWebSocketHandler();
+                if (wsHandler && wsHandler.isConnected()) {
+                    // Create a synthetic payload to reuse the handler logic
+                    const mockPayload = { id: Date.now() };
+                    const mockMessage = { session_id: wsHandler.currentSessionId || "manual" };
+                    wsHandler.handleCameraSimulation(mockMessage, mockPayload, 'self.camera.take_picture');
+                } else {
+                    alert('需要先连接服务器才能使用视觉功能');
+                    this.hideModal('cameraModal');
+                }
+            });
         }
 
         // Switch character button
@@ -482,7 +501,7 @@ class UIController {
 
             if (isConnected) {
                 // Check microphone availability (check again after connection)
-                const { checkMicrophoneAvailability } = await import('../core/audio/recorder.js?v=0212-4');
+                const { checkMicrophoneAvailability } = await import('../core/audio/recorder.js?v=0310-1');
                 const micAvailable = await checkMicrophoneAvailability();
 
                 if (!micAvailable) {

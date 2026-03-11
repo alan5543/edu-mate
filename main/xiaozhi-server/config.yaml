@@ -160,15 +160,13 @@ plugins:
       - ".wav"
       - ".p3"
     refresh_time: 300 # 刷新音乐列表的时间间隔，单位为秒
-  search_from_ragflow:
-    # 知识库的描述信息，方便大语言模型知道什么时候调用
-    description: "当用户问xxx时，调用本方法，使用知识库中的信息回答问题"
-    # ragflow接口配置
-    base_url: "http://192.168.0.8"
-    # ragflow api访问令牌
-    api_key: "ragflow-xxx"
-    # ragflow知识库id
-    dataset_ids: ["123456789"]
+  search_from_tavily:
+    # Tavily搜索API密钥
+    # 申请地址：https://app.tavily.com/home
+    api_key: "your-tavily-api-key"
+    # 搜索返回的最大结果数
+    max_results: 3
+
 # 声纹识别配置
 voiceprint:
   # 声纹接口地址
@@ -263,6 +261,9 @@ Intent:
     functions:
       - change_role
       - get_weather
+      - search_from_wikipedia
+      - search_from_tavily
+      - fetch_url_content
       # - search_from_ragflow
       # - get_news_from_chinanews
       - get_news_from_newsnow

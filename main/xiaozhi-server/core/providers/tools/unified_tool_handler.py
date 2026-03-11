@@ -74,6 +74,9 @@ class UnifiedToolHandler:
             # 输出当前支持的所有工具列表
             self.current_support_functions()
 
+            # 向客户端发送工具列表
+            await self.send_tool_list()
+
         except Exception as e:
             self.logger.error(f"统一工具处理器初始化失败: {e}")
 
@@ -135,6 +138,44 @@ class UnifiedToolHandler:
         """检查是否有指定工具"""
         return self.tool_manager.has_tool(tool_name)
 
+    async def send_tool_list(self):
+        """向客户端发送当前活跃的工具列表"""
+        try:
+            tools = self.tool_manager.get_all_tools()
+            tool_list = []
+            for name, tool_def in tools.items():
+                tool_list.append({
+                    "name": name,
+                    "type": tool_def.tool_type.value if hasattr(tool_def, 'tool_type') else "unknown",
+                    "description": tool_def.description.get("function", {}).get("description", "") if isinstance(tool_def.description, dict) else str(tool_def.description),
+                })
+            msg = json.dumps({"type": "tool_list", "tools": tool_list})
+            await self.conn.websocket.send(msg)
+            self.logger.debug(f"已发送工具列表到客户端，共 {len(tool_list)} 个工具")
+        except Exception as e:
+            self.logger.error(f"发送工具列表失败（客户端可能不支持）: {e}")
+
+    async def _notify_tool_call(self, function_name: str, arguments: dict, result: ActionResponse):
+        """向客户端通知工具调用事件"""
+        try:
+            result_text = ""
+            result_response = ""
+            if result:
+                result_text = (result.result or "")[:3000]
+                result_response = (result.response or "")[:1000]
+
+            event = {
+                "type": "tool_call",
+                "name": function_name,
+                "arguments": arguments,
+                "result_action": result.action.name if result else "ERROR",
+                "result_summary": result_text,       # The text sent to LLM (tool result)
+                "result_response": result_response,   # Direct response text (if any)
+            }
+            await self.conn.websocket.send(json.dumps(event))
+        except Exception:
+            pass  # 静默失败，不影响主流程
+
     async def handle_llm_function_call(
         self, conn, function_call_data: Dict[str, Any]
     ) -> Optional[ActionResponse]:
@@ -169,6 +210,10 @@ class UnifiedToolHandler:
 
             # 执行工具调用
             result = await self.tool_manager.execute_tool(function_name, arguments)
+
+            # 通知客户端工具调用事件
+            await self._notify_tool_call(function_name, arguments, result)
+
             return result
 
         except Exception as e:
@@ -213,6 +258,7 @@ class UnifiedToolHandler:
         self.device_iot_executor.register_iot_tools(descriptors)
         self.tool_manager.refresh_tools()
         self.logger.info(f"注册了{len(descriptors)}个IoT设备的工具")
+        await self.send_tool_list()
 
     def get_tool_statistics(self) -> Dict[str, int]:
         """获取工具统计信息"""
